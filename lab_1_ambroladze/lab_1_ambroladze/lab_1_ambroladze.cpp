@@ -21,271 +21,237 @@ struct KS {
     double Efficiency;
 };
 
-bool CheckDouble(string input)
+double DoubleInput()
 {
-    int length, i, point_count=0;
-    bool error = false;
-    length = input.length() - 1;
-    if (input.length() == 0) {
-        return false;
-    }
-    for (i = 0; i <= length; ++i)
-    {
-        if ((input[i] == '.'))
-        {
-            point_count++;
+    int length, point_count=0;
+    bool valid = true;
+    string input;
+    while (true) {
+        valid = true;
+        getline(cin, input);
+        length = input.length() - 1;
+        if (input.length() == 0) {
+            valid = false;
         }
-        else
-        {
-            if (!isdigit(input[i]))
-            {
-                error = true;
+        for ( int i = 0; i <= length; ++i) {
+            if ((input[i] == '.')) {
+                point_count++;
+            }
+            else {
+                if (!isdigit(input[i])) {
+                    valid = false;
+                    break;
+                }
             }
         }
-    }
-    if (point_count <= 1) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-bool CheckInt(string input)
-{
-    int length, i;
-    length = input.length() - 1;
-    if (input.length() == 0) {
-        return false;
-    }
-    for (i = 0; i <= length; ++i)
-    {
-        if (!isdigit(input[i]))
-        {
-            return false;
+        if (point_count <= 1 && valid) {
+            return stod(input);
+        }
+        else {
+            cout << "Введен некорректный символ, попробуйте еще раз: " << endl;
         }
     }
-    return true;
 }
 
-bool CheckIDPipe(vector<pipe>& pipes, int newID)
+int IntInput()
 {
-    int i;
-    if (pipes.size() > 0)
-    {
-        for (i = 0; i < pipes.size(); ++i)
-        {
-            if (newID == pipes[i].id)
-            {
-                return true;
+    int length;
+    bool valid;
+    string input;
+    while (true) {
+        valid = true;
+        getline(cin, input);
+        length = input.length() - 1;
+        if (input.length() == 0) {
+            valid = false;
+            break;
+        }
+        for (int i = 0; i <= length; ++i) {
+            if (!isdigit(input[i])) {
+                valid = false;
+                break;
             }
         }
-    }
-    return false;
-}
-
-bool CheckIDKompress(vector<KS>&kompress, int newID)
-{
-    int i;
-    if (kompress.size() > 0)
-    {
-        for (i = 0; i < kompress.size(); ++i)
-        {
-            if (newID == kompress[i].id)
-            {
-                return true;
-            }
+        if (valid) {
+            return stoi(input);
+        }
+        else {
+            cout << "Введен некорректный символ, попробуйте еще раз: " << endl;
         }
     }
-    return false;
 }
-
 
 void AddPipeline(vector<pipe> &pipes)
 {
     system("cls");
-    string input;
-    cout << "Введите характеристики трубы: \nID: ";
+    double input;
+    string inputStr;
+    cout << "Введите характеристики трубы: " << endl;
     pipes.resize(pipes.size() + 1);
-    while (true)
-    {
-        getline(cin,input);
-        if (CheckInt(input)) {
-            if (!CheckIDPipe(pipes, stoi(input))) {
-                pipes[pipes.size() - 1].id = stoi(input);
-                break;
-            }
-            else
-            {
-                cout << "Такой ID уже существует, попробуйте еще раз: ";
-            }
-        }
-        else {
-            cout << "Введен некорректный символ, попробуйте еще раз: ";
-        }
-    }
-    cout << "Длина: ";
-    while (true)
-    {
-        getline(cin, input);
-        if (CheckDouble(input)) {
-            pipes[pipes.size() - 1].length = stod(input);
+    pipes[pipes.size() - 1].id = pipes.size();
+    cout << "Длина: " << endl;
+    while (true) {
+        input = DoubleInput();
+        if (input > 0) {
+            pipes[pipes.size() - 1].length = input;
             break;
         }
         else {
-            cout << "Введен некорректный символ, попробуйте еще раз: ";
+            cout << "Длина не может быть нулевой, попробуйте еще раз: " << endl;
         }
     }
-    cout << "Диаметр: ";
-    while (true)
-    {
-        getline(cin, input);
-        if (CheckDouble(input)) {
-            pipes[pipes.size() - 1].diameter = stod(input);
+    cout << "Диаметр: " << endl;
+    while (true) {
+        input = DoubleInput();
+        if (input > 0) {
+            pipes[pipes.size() - 1].diameter = input;
             break;
         }
         else {
-            cout << "Введен некорректный символ, попробуйте еще раз: ";
+            cout << "Диаметр не может быть нулевой, попробуйте еще раз: " << endl;
         }
     }
-    cout << "Введите 1, если труба в ремонте, или 0, если труба не в ремонте: ";
-    while (true)
-    {
-        getline(cin, input);
-        if (input=="1" || input=="0") {
-            pipes[pipes.size() - 1].repair = stoi(input);
+    cout << "Введите 1, если труба в ремонте, или 0, если труба не в ремонте: " << endl;
+    while (true) {
+        getline(cin, inputStr);
+        if (inputStr =="1" || inputStr =="0") {
+            pipes[pipes.size() - 1].repair = (inputStr == "1") ? true : false;
             break;
         }
         else {
-            cout << "Введен некорректный символ, попробуйте еще раз: ";
+            cout << "Введен некорректный символ, попробуйте еще раз: " << endl;
         }
     }
+    cout << "0.Выход";
 }
 
-void AddKC(vector<KS>&kompress)
+void AddKS(vector<KS> &kompress)
 {
     system("cls");
-    string input;
-    cout << "Введите характеристики КС: \nID: ";
+    int input;
+    string inputStr;
+    cout << "Введите характеристики компрессорной станции: " << endl;
     kompress.resize(kompress.size() + 1);
-    while (true)
-    {
-        getline(cin, input);
-        if (CheckInt(input)) {
-            if (!CheckIDKompress(kompress, stoi(input))) {
-                kompress[kompress.size() - 1].id = stoi(input);
-                break;
-            }
-            else
-            {
-                cout << "Такой ID уже существует, попробуйте еще раз: ";
-            }
-        }
-        else {
-            cout << "Введен некорректный символ, попробуйте еще раз: ";
-        }
-    }
-    cout << "Название: ";
-    getline(cin, input);
-    kompress[kompress.size() - 1].Name = input;
-    cout << "Количество цехов: ";
-    while (true)
-    {
-        getline(cin, input);
-        if (CheckInt(input)) {
-            kompress[kompress.size() - 1].Count = stoi(input);
+    kompress[kompress.size() - 1].id = kompress.size();
+    cout << "Имя: " << endl;
+    while (true) {
+        getline (cin, inputStr);
+        if (inputStr.length() > 0) {
+            kompress[kompress.size() - 1].Name = inputStr;
             break;
         }
         else {
-            cout << "Введен некорректный символ, попробуйте еще раз: ";
+            cout << "Имя не может быть пустым, попробуйте еще раз: " << endl;
         }
     }
-    cout << "Количество цехов в работе: ";
-    while (true)
-    {
-        getline(cin, input);
-        if (CheckInt(input)) {
-            if (stoi(input) <= kompress[kompress.size() - 1].Count) {
-                kompress[kompress.size() - 1].CountInWork = stoi(input);
-                break;
-            }
-            else 
-            { 
-                cout << "Количество цехов в работе не может быть больше общего кол-ва, поробуйте еще раз: "; 
-            }
-        }
-        else {
-            cout << "Введен некорректный символ, попробуйте еще раз: ";
-        }
-    }
-    cout << "Эффективность: ";
-    while (true)
-    {
-        getline(cin, input);
-        if (CheckDouble(input)) {
-            kompress[kompress.size() - 1].Efficiency = stod(input);
+    cout << "Кол-во цехов: " << endl;
+    while (true) {
+        input = IntInput();
+        if (input > 0) {
+            kompress[kompress.size() - 1].Count = input;
             break;
         }
         else {
-            cout << "Введен некорректный символ, попробуйте еще раз: ";
+            cout << "Кол-во цехов не может быть нулевым, попробуйте еще раз: " << endl;
         }
     }
+    cout << "Кол-во цехов в работе: " << endl;
+    while (true) {
+        input = IntInput();
+        if (input <= kompress[kompress.size() - 1].Count) {
+            kompress[kompress.size() - 1].CountInWork = input;
+            break;
+        }
+        else {
+            cout << "Кол-во цехов в работе не может быть больше общего кол-ва цехов: " << endl;
+        }
+    }
+    cout << "Эффективность: " << endl;
+    while (true) {
+        input = DoubleInput();
+        if (input >= 0 && input <=1) {
+            kompress[kompress.size() - 1].Efficiency = input;
+            break;
+        }
+        else {
+            cout << "Эффективность должна находиться в пределах от 0 до 1: " << endl;
+        }
+    }
+    cout << "0.Выход";
 }
 
-void ShowPipeline(vector<pipe> &pipes, vector<KS>& kompress)
+void ShowPipes(const vector<pipe> &pipes)
 {
-    system("cls");
-    int i;
     cout <<"Трубопроводы"<< endl <<
         setw(10) << "ID" << 
         setw(20) << "Длина" << 
         setw(20) << "Диаметр" << 
         setw(20) << "В ремонте" << endl;
-    if (pipes.size() > 0)
-    {
-        for (i = 0; i < pipes.size(); ++i)
-        {
+    if (pipes.size() > 0) {
+        for (int i = 0; i < pipes.size(); ++i) {
             cout << setw(10) << pipes[i].id <<
                 setw(20) << pipes[i].length <<
-                setw(20) << pipes[i].diameter <<
-                setw(20) << pipes[i].repair << endl;
+                setw(20) << pipes[i].diameter;
+            cout << setw(20) << ((pipes[i].repair == true) ? "Да" : "Нет") << endl;
         }
     }
     else {
-        cout << "Массив пустой";
+        cout << setw(40) << "Массив пуст" << endl;
     }
+    
+}
+
+void ShowKompres(const vector<KS> &kompress)
+{
     cout << "Компрессорные станции" << endl <<
         setw(10) << "ID" <<
         setw(20) << "Название" <<
         setw(20) << "Кол-во цехов" <<
-        setw(20) << "Цехов в работе" << 
+        setw(20) << "Цехов в работе" <<
         setw(20) << "Эффективность" << endl;
-    if (kompress.size() > 0)
-    {
-        for (i = 0; i < kompress.size(); ++i)
+    if (kompress.size() > 0) {
+        for (int i = 0; i < kompress.size(); ++i)
         {
             cout << setw(10) << kompress[i].id <<
                 setw(20) << kompress[i].Name <<
                 setw(20) << kompress[i].Count <<
-                setw(20) << kompress[i].CountInWork << 
+                setw(20) << kompress[i].CountInWork <<
                 setw(20) << kompress[i].Efficiency << endl;
         }
     }
     else {
-        cout << "Массив пустой";
+        cout << setw(40) << "Массив пуст" << endl;
     }
+}
+
+void EditPipes(vector<pipe> &pipes)
+{
+    int input;
+    system("cls");
+    ShowPipes(pipes);
+    cout << "Введите номер трубы, которую хотите изменить" << endl;
+    while (true) {
+        input = IntInput()-1;
+        if (input <= pipes.size()) {
+            pipes[input].repair = !pipes[input].repair;
+            break;
+        }
+        else {
+            cout << "Такого номера не существует, попробуйте еще раз: " << endl;
+        }
+    }
+    cout << "Успешное редактирование" << endl << "0.Выход";
 }
 
 int main()
 {
-    setlocale(LC_CTYPE, "Russian");
+    setlocale(LC_ALL, "Russian");
     vector<pipe> pipes;
     vector<KS> kompress;
     char inputmenu;
     pipes.resize(0);
     kompress.resize(0);
-    while (true)
-    {
+    while (true) {
         system("cls");
         cout << "1. Добавить трубу " << endl << 
             "2. Добавить КС  " << endl << 
@@ -296,8 +262,7 @@ int main()
             "7. Загрузить  " << endl << 
             "0. Выход  " << endl;
         inputmenu = _getch();
-        switch (inputmenu)
-        {
+        switch (inputmenu) {
         case '1':
             system("cls");
             AddPipeline(pipes);
@@ -309,7 +274,7 @@ int main()
             break;
         case '2':
             system("cls");
-            AddKC(kompress);
+            AddKS(kompress);
             while (true) {
                 if (_getch() == '0') {
                     break;
@@ -318,7 +283,9 @@ int main()
             break;
         case '3':
             system("cls");
-            ShowPipeline(pipes,kompress);
+            ShowPipes(pipes);
+            ShowKompres(kompress);
+            cout << "0.Выход";
             while (true) {
                 if (_getch() == '0') {
                     break;
@@ -327,7 +294,7 @@ int main()
             break;
         case '4':
             system("cls");
-            cout << "4\n";
+            EditPipes(pipes);
             while (true) {
                 if (_getch() == '0') {
                     break;
