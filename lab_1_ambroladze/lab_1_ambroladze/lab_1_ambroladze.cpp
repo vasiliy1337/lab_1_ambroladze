@@ -79,18 +79,18 @@ int IntInput() {
     }
 }
 
-void AddPipeline(vector<pipe> &pipes) {
+pipe AddPipeline(unsigned int id) {
     system("cls");
+    pipe NewPipe;
     double input;
     string inputStr;
     cout << "Введите характеристики трубы: " << endl;
-    pipes.resize(pipes.size() + 1);
-    pipes[pipes.size() - 1].id = pipes.size();
+    NewPipe.id = id;
     cout << "Длина: " << endl;
     while (true) {
         input = DoubleInput();
         if (input > 0) {
-            pipes[pipes.size() - 1].length = input;
+            NewPipe.length = input;
             break;
         }
         else {
@@ -101,7 +101,7 @@ void AddPipeline(vector<pipe> &pipes) {
     while (true) {
         input = IntInput();
         if (input > 0) {
-            pipes[pipes.size() - 1].diameter = input;
+            NewPipe.diameter = input;
             break;
         }
         else {
@@ -112,29 +112,29 @@ void AddPipeline(vector<pipe> &pipes) {
     while (true) {
         getline(cin, inputStr);
         if (inputStr =="1" || inputStr =="0") {
-            pipes[pipes.size() - 1].repair = (inputStr == "1") ? true : false;
+            NewPipe.repair = (inputStr == "1") ? true : false;
             break;
         }
         else {
             cout << "Введен некорректный символ, попробуйте еще раз: " << endl;
         }
     }
-    cout << "0.Выход";
+    return NewPipe;
 }
 
-void AddKS(vector<KS> &kompres) {
+KS AddKS(unsigned int id) {
     system("cls");
+    KS NewKompress;
     int input;
     string inputStr;
     double inputDouble;
     cout << "Введите характеристики компрессорной станции: " << endl;
-    kompres.resize(kompres.size() + 1);
-    kompres[kompres.size() - 1].id = kompres.size();
+    NewKompress.id = id;
     cout << "Имя: " << endl;
     while (true) {
         getline (cin, inputStr);
         if (inputStr.length() > 0) {
-            kompres[kompres.size() - 1].Name = inputStr;
+            NewKompress.Name = inputStr;
             break;
         }
         else {
@@ -145,7 +145,7 @@ void AddKS(vector<KS> &kompres) {
     while (true) {
         input = IntInput();
         if (input > 0) {
-            kompres[kompres.size() - 1].Count = input;
+            NewKompress.Count = input;
             break;
         }
         else {
@@ -155,8 +155,8 @@ void AddKS(vector<KS> &kompres) {
     cout << "Кол-во цехов в работе: " << endl;
     while (true) {
         input = IntInput();
-        if (input <= kompres[kompres.size() - 1].Count) {
-            kompres[kompres.size() - 1].CountInWork = input;
+        if (input <= NewKompress.Count) {
+            NewKompress.CountInWork = input;
             break;
         }
         else {
@@ -167,14 +167,14 @@ void AddKS(vector<KS> &kompres) {
     while (true) {
         inputDouble = DoubleInput();
         if (inputDouble >= 0. && inputDouble <=1.) {
-            kompres[kompres.size() - 1].Efficiency = inputDouble;
+            NewKompress.Efficiency = inputDouble;
             break;
         }
         else {
             cout << "Эффективность должна находиться в пределах от 0 до 1: " << endl;
         }
     }
-    cout << "0.Выход";
+    return NewKompress;
 }
 
 void ShowPipes(const vector<pipe> &pipes) {
@@ -301,7 +301,7 @@ void ReadFile(vector<pipe>& pipes, vector<KS>& kompres) {
     ifstream fin;
     string input;
     fin.open("data.txt");
-    getline (fin,input);
+    getline(fin, input);
     if (input != "nopipe") {
         getline(fin, input);
         pipes.resize(stoi(input));
@@ -328,7 +328,7 @@ void ReadFile(vector<pipe>& pipes, vector<KS>& kompres) {
             getline(fin, input);
             kompres[i].Count = stoi(input);
             getline(fin, input);
-            kompres [i].CountInWork = stoi(input);
+            kompres[i].CountInWork = stoi(input);
             getline(fin, input);
             kompres[i].Efficiency = stod(input);
         }
@@ -360,20 +360,18 @@ int main()
         switch (inputmenu) {
         case '1':
             system("cls");
-            AddPipeline(pipes);
+            pipes.push_back(AddPipeline(pipes.size()+1));
+            cout << "0.Выход";
             while (true) {
-                if (_getch() == '0') {
-                    break; 
-                }
+                if (_getch() == '0') break;
             }
             break;
         case '2':
             system("cls");
-            AddKS(kompres);
+            kompres.push_back(AddKS(kompres.size() + 1));
+            cout << "0.Выход";
             while (true) {
-                if (_getch() == '0') {
-                    break;
-                }
+                if (_getch() == '0') break;
             }
             break;
         case '3':
@@ -383,9 +381,7 @@ int main()
             ShowKompres(kompres);
             cout << "0.Выход";
             while (true) {
-                if (_getch() == '0') {
-                    break;
-                }
+                if (_getch() == '0') break;
             }
             break;
         case '4':
@@ -393,9 +389,7 @@ int main()
             EditPipes(pipes);
             cout << "0.Выход";
             while (true) {
-                if (_getch() == '0') {
-                    break;
-                }
+                if (_getch() == '0') break;
             }
             break;
         case '5':
@@ -403,9 +397,7 @@ int main()
             EditKompres(kompres);
             cout << "0.Выход";
             while (true) {
-                if (_getch() == '0') {
-                    break;
-                }
+                if (_getch() == '0') break;
             }
             break;
         case '6':
@@ -413,9 +405,7 @@ int main()
             CreateFile(pipes, kompres);
             cout << "0.Выход";
             while (true) {
-                if (_getch() == '0') {
-                    break;
-                }
+                if (_getch() == '0') break;
             }
             break;
         case '7':
@@ -423,9 +413,7 @@ int main()
             ReadFile(pipes, kompres);
             cout << "0.Выход";
             while (true) {
-                if (_getch() == '0') {
-                    break;
-                }
+                if (_getch() == '0') break;
             }
             break;
         case '0':
