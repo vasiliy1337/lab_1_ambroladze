@@ -1,16 +1,16 @@
 ﻿#include <iostream>
 #include <string>
 #include <conio.h>
-#include <sstream>
 #include <vector>
-#include <stdlib.h>
 #include <iomanip>
-
+#include <fstream>
+//#include <windows.h>
 using namespace std;
 
 struct pipe{
     unsigned int id;
-    double length, diameter;
+    double length;
+    int diameter;
     bool repair;
 };
 
@@ -99,7 +99,7 @@ void AddPipeline(vector<pipe> &pipes) {
     }
     cout << "Диаметр: " << endl;
     while (true) {
-        input = DoubleInput();
+        input = IntInput();
         if (input > 0) {
             pipes[pipes.size() - 1].diameter = input;
             break;
@@ -122,19 +122,19 @@ void AddPipeline(vector<pipe> &pipes) {
     cout << "0.Выход";
 }
 
-void AddKS(vector<KS> &kompress) {
+void AddKS(vector<KS> &kompres) {
     system("cls");
     int input;
     string inputStr;
     double inputDouble;
     cout << "Введите характеристики компрессорной станции: " << endl;
-    kompress.resize(kompress.size() + 1);
-    kompress[kompress.size() - 1].id = kompress.size();
+    kompres.resize(kompres.size() + 1);
+    kompres[kompres.size() - 1].id = kompres.size();
     cout << "Имя: " << endl;
     while (true) {
         getline (cin, inputStr);
         if (inputStr.length() > 0) {
-            kompress[kompress.size() - 1].Name = inputStr;
+            kompres[kompres.size() - 1].Name = inputStr;
             break;
         }
         else {
@@ -145,7 +145,7 @@ void AddKS(vector<KS> &kompress) {
     while (true) {
         input = IntInput();
         if (input > 0) {
-            kompress[kompress.size() - 1].Count = input;
+            kompres[kompres.size() - 1].Count = input;
             break;
         }
         else {
@@ -155,8 +155,8 @@ void AddKS(vector<KS> &kompress) {
     cout << "Кол-во цехов в работе: " << endl;
     while (true) {
         input = IntInput();
-        if (input <= kompress[kompress.size() - 1].Count) {
-            kompress[kompress.size() - 1].CountInWork = input;
+        if (input <= kompres[kompres.size() - 1].Count) {
+            kompres[kompres.size() - 1].CountInWork = input;
             break;
         }
         else {
@@ -167,7 +167,7 @@ void AddKS(vector<KS> &kompress) {
     while (true) {
         inputDouble = DoubleInput();
         if (inputDouble >= 0. && inputDouble <=1.) {
-            kompress[kompress.size() - 1].Efficiency = inputDouble;
+            kompres[kompres.size() - 1].Efficiency = inputDouble;
             break;
         }
         else {
@@ -190,18 +190,17 @@ void ShowPipes(const vector<pipe> &pipes) {
     else {
         cout << setw(40) << "Массив пуст" << endl;
     }
-    
 }
 
-void ShowKompres(const vector<KS> &kompress) {
+void ShowKompres(const vector<KS> &kompres) {
     cout << "Компрессорные станции" << endl << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Кол-во цехов" << setw(20) << "Цехов в работе" << setw(20) << "Эффективность" << endl;
-    if (kompress.size() > 0) {
-        for (int i = 0; i < kompress.size(); ++i) {
-            cout << setw(10) << kompress[i].id << 
-                setw(20) << kompress[i].Name << 
-                setw(20) << kompress[i].Count << 
-                setw(20) << kompress[i].CountInWork << 
-                setw(20) << kompress[i].Efficiency << endl;
+    if (kompres.size() > 0) {
+        for (int i = 0; i < kompres.size(); ++i) {
+            cout << setw(10) << kompres[i].id << 
+                setw(20) << kompres[i].Name << 
+                setw(20) << kompres[i].Count << 
+                setw(20) << kompres[i].CountInWork << 
+                setw(20) << kompres[i].Efficiency << endl;
         }
     }
     else {
@@ -232,7 +231,6 @@ void EditPipes(vector<pipe> &pipes) {
     else {
         cout << "Трубопроводы не были добавлены, редактировать нечего" << endl;
     }
-    cout << "0.Выход";
 }
 
 void EditKompres(vector<KS> &kompres) {
@@ -268,12 +266,81 @@ void EditKompres(vector<KS> &kompres) {
     else {
         cout << "Станции не были добавлены, редактировать нечего" << endl;
     }
-    cout << "0.Выход";
+}
+
+void CreateFile(const vector<pipe>& pipes, const vector<KS>& kompres) {
+    ofstream fout;
+    fout.open("data.txt");
+    if (pipes.size() > 0) {
+        fout << "pipe" << endl;
+        fout << pipes.size() << endl;
+        for (int i = 0; i < pipes.size(); ++i) {
+            fout << pipes[i].id << endl << pipes[i].length << endl << pipes[i].diameter << endl << ((pipes[i].repair == true) ? 1 : 0) << endl;
+        }
+    }
+    else {
+        cout << "Трубы не были добавлены" << endl;
+        fout << "nopipe" << endl;
+    }
+    if (kompres.size() > 0) {
+        fout << "kc" << endl;
+        fout << kompres.size() << endl;
+        for (int i = 0; i < kompres.size(); ++i) {
+            fout << kompres[i].id << endl << kompres[i].Name << endl << kompres[i].Count << endl << kompres[i].CountInWork << endl << kompres[i].Efficiency << endl;
+        }
+    }
+    else {
+        cout << "КС не были добавлены" << endl;
+        fout << "nokc" << endl;
+    }
+    fout.close();
+    cout << "Данные сохранены в файл" << endl;
+}
+
+void ReadFile(vector<pipe>& pipes, vector<KS>& kompres) {
+    ifstream fin;
+    string input;
+    fin.open("data.txt");
+    getline (fin,input);
+    if (input != "nopipe") {
+        getline(fin, input);
+        pipes.resize(stoi(input));
+        for (int i = 0; i < pipes.size(); ++i) {
+            getline(fin, input);
+            pipes[i].id = stoi(input);
+            getline(fin, input);
+            pipes[i].length = stod(input);
+            getline(fin, input);
+            pipes[i].diameter = stoi(input);
+            getline(fin, input);
+            pipes[i].repair = stoi(input);
+        }
+    }
+    getline(fin, input);
+    if (input != "nokc") {
+        getline(fin, input);
+        kompres.resize(stoi(input));
+        for (int i = 0; i < pipes.size(); ++i) {
+            getline(fin, input);
+            kompres[i].id = stoi(input);
+            getline(fin, input);
+            kompres[i].Name = input;
+            getline(fin, input);
+            kompres[i].Count = stoi(input);
+            getline(fin, input);
+            kompres [i].CountInWork = stoi(input);
+            getline(fin, input);
+            kompres[i].Efficiency = stod(input);
+        }
+    }
+    cout << "Данные загружены" << endl;
 }
 
 int main()
 {
     setlocale(LC_CTYPE, "Russian");
+    //SetConsoleCP(1251);
+    //SetConsoleOutputCP(1251);
     vector<pipe> pipes;
     vector<KS> kompres;
     char inputmenu;
@@ -324,6 +391,7 @@ int main()
         case '4':
             system("cls");
             EditPipes(pipes);
+            cout << "0.Выход";
             while (true) {
                 if (_getch() == '0') {
                     break;
@@ -333,6 +401,7 @@ int main()
         case '5':
             system("cls");
             EditKompres(kompres);
+            cout << "0.Выход";
             while (true) {
                 if (_getch() == '0') {
                     break;
@@ -341,7 +410,8 @@ int main()
             break;
         case '6':
             system("cls");
-            cout << "6\n";
+            CreateFile(pipes, kompres);
+            cout << "0.Выход";
             while (true) {
                 if (_getch() == '0') {
                     break;
@@ -350,7 +420,8 @@ int main()
             break;
         case '7':
             system("cls");
-            cout << "7\n";
+            ReadFile(pipes, kompres);
+            cout << "0.Выход";
             while (true) {
                 if (_getch() == '0') {
                     break;
