@@ -14,20 +14,46 @@ struct pipe{
     bool repair;
 };
 
-struct KS {
+struct KS{
     unsigned int id;
     string Name;
     unsigned int Count, CountInWork;
     double Efficiency;
 };
 
+string DeleteSpace(string input) {
+    int i;
+    if (input.length() > 0) {
+        while (input[0] == ' ') {
+            input.erase(0, 1);
+            if (input.length() == 0) {
+                break;
+            }
+        }
+    }
+    if (input.length() > 0) {
+        while (input[input.size() - 1] == ' ') {
+            i = input.size();
+            input.erase(i - 1, i);
+            if (input.length() == 0) {
+                break;
+            }
+        }
+    }
+    return input;
+}
+
 double DoubleInput() {
-    int length, point_count=0;
+    int length, point_count;
     bool valid = true;
     string input;
     while (true) {
+        point_count = 0;
         valid = true;
         getline(cin, input);
+
+        input=DeleteSpace(input);
+
         length = input.length() - 1;
         if (input.length() == 0) {
             valid = false;
@@ -43,7 +69,7 @@ double DoubleInput() {
                 }
             }
         }
-        if (point_count <= 1 && valid) {
+        if (point_count <= 1 && valid && input != ".") {
             return stod(input);
         }
         else {
@@ -59,10 +85,10 @@ int IntInput() {
     while (true) {
         valid = true;
         getline(cin, input);
+        input = DeleteSpace(input);
         length = input.length() - 1;
         if (input.length() == 0) {
             valid = false;
-            break;
         }
         for (int i = 0; i <= length; ++i) {
             if (!isdigit(input[i])) {
@@ -83,6 +109,7 @@ pipe AddPipeline(unsigned int id) {
     system("cls");
     pipe NewPipe;
     double input;
+    int inputInt;
     string inputStr;
     cout << "Введите характеристики трубы: " << endl;
     NewPipe.id = id;
@@ -99,9 +126,9 @@ pipe AddPipeline(unsigned int id) {
     }
     cout << "Диаметр: " << endl;
     while (true) {
-        input = IntInput();
-        if (input > 0) {
-            NewPipe.diameter = input;
+        inputInt = IntInput();
+        if (inputInt > 0) {
+            NewPipe.diameter = inputInt;
             break;
         }
         else {
@@ -111,6 +138,7 @@ pipe AddPipeline(unsigned int id) {
     cout << "Введите 1, если труба в ремонте, или 0, если труба не в ремонте: " << endl;
     while (true) {
         getline(cin, inputStr);
+        inputStr = DeleteSpace(inputStr);
         if (inputStr =="1" || inputStr =="0") {
             NewPipe.repair = (inputStr == "1") ? true : false;
             break;
@@ -133,6 +161,7 @@ KS AddKS(unsigned int id) {
     cout << "Имя: " << endl;
     while (true) {
         getline (cin, inputStr);
+        inputStr = DeleteSpace(inputStr);
         if (inputStr.length() > 0) {
             NewKompress.Name = inputStr;
             break;
@@ -313,14 +342,14 @@ void ReadFile(vector<pipe>& pipes, vector<KS>& kompres) {
             getline(fin, input);
             pipes[i].diameter = stoi(input);
             getline(fin, input);
-            pipes[i].repair = stoi(input);
+            pipes[i].repair;
         }
     }
     getline(fin, input);
     if (input != "nokc") {
         getline(fin, input);
         kompres.resize(stoi(input));
-        for (int i = 0; i < pipes.size(); ++i) {
+        for (int i = 0; i < kompres.size(); ++i) {
             getline(fin, input);
             kompres[i].id = stoi(input);
             getline(fin, input);
