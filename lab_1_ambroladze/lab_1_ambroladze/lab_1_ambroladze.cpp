@@ -1,9 +1,9 @@
 ﻿#include <iostream>
 #include <string>
-#include <conio.h>
+#include <conio.h> //getch
 #include <vector>
-#include <iomanip>
-#include <fstream>
+#include <iomanip> //setw
+#include <fstream>  //файлы
 //#include <windows.h>
 using namespace std;
 
@@ -22,7 +22,6 @@ struct KS{
 };
 
 string DeleteSpace(string input) {
-    int i;
     if (input.length() > 0) {
         while (input[0] == ' ') {
             input.erase(0, 1);
@@ -33,8 +32,7 @@ string DeleteSpace(string input) {
     }
     if (input.length() > 0) {
         while (input[input.size() - 1] == ' ') {
-            i = input.size();
-            input.erase(i - 1, i);
+            input.erase(input.size() - 1, input.size());
             if (input.length() == 0) {
                 break;
             }
@@ -45,7 +43,7 @@ string DeleteSpace(string input) {
 
 double DoubleInput() {
     int length, point_count;
-    bool valid = true;
+    bool valid;
     string input;
     while (true) {
         point_count = 0;
@@ -56,18 +54,20 @@ double DoubleInput() {
         if (input.length() == 0) {
             valid = false;
         }
-        for ( int i = 0; i <= length; ++i) {
-            if ((input[i] == '.')) {
-                point_count++;
-            }
-            else {
-                if (!isdigit(input[i])) {
-                    valid = false;
-                    break;
+        else {
+            for (int i = 0; i <= length; ++i) {
+                if ((input[i] == '.')) {
+                    point_count++;
+                }
+                else {
+                    if (!isdigit(input[i])) {
+                        valid = false;
+                        break;
+                    }
                 }
             }
         }
-        if (point_count <= 1 && valid && input != ".") {
+        if (valid && point_count <= 1 && input != ".") {
             return stod(input);
         }
         else {
@@ -88,10 +88,12 @@ int IntInput() {
         if (input.length() == 0) {
             valid = false;
         }
-        for (int i = 0; i <= length; ++i) {
-            if (!isdigit(input[i])) {
-                valid = false;
-                break;
+        else {
+            for (int i = 0; i <= length; ++i) {
+                if (!isdigit(input[i])) {
+                    valid = false;
+                    break;
+                }
             }
         }
         if (valid) {
@@ -104,18 +106,17 @@ int IntInput() {
 }
 
 pipe AddPipeline(unsigned int id) {
-    system("cls");
     pipe NewPipe;
-    double input;
+    double inputDouble;
     int inputInt;
     string inputStr;
     cout << "Введите характеристики трубы: " << endl;
     NewPipe.id = id;
     cout << "Длина: " << endl;
     while (true) {
-        input = DoubleInput();
-        if (input > 0) {
-            NewPipe.length = input;
+        inputDouble = DoubleInput();
+        if (inputDouble > 0) {
+            NewPipe.length = inputDouble;
             break;
         }
         else {
@@ -151,7 +152,7 @@ pipe AddPipeline(unsigned int id) {
 KS AddKS(unsigned int id) {
     system("cls");
     KS NewKompress;
-    int input;
+    int inputInt;
     string inputStr;
     double inputDouble;
     cout << "Введите характеристики компрессорной станции: " << endl;
@@ -170,9 +171,9 @@ KS AddKS(unsigned int id) {
     }
     cout << "Кол-во цехов: " << endl;
     while (true) {
-        input = IntInput();
-        if (input > 0) {
-            NewKompress.Count = input;
+        inputInt = IntInput();
+        if (inputInt > 0) {
+            NewKompress.Count = inputInt;
             break;
         }
         else {
@@ -181,9 +182,9 @@ KS AddKS(unsigned int id) {
     }
     cout << "Кол-во цехов в работе: " << endl;
     while (true) {
-        input = IntInput();
-        if (input <= NewKompress.Count) {
-            NewKompress.CountInWork = input;
+        inputInt = IntInput();
+        if (inputInt <= NewKompress.Count) {
+            NewKompress.CountInWork = inputInt;
             break;
         }
         else {
@@ -222,24 +223,20 @@ cout << setw(10) << kompres.id <<
 void ShowAllPipes(const vector<pipe> pipes)
 {
     cout << "Трубопроводы" << endl << setw(10) << "ID" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(20) << "В ремонте" << endl;
-    for (int i = 0; i < pipes.size(); ++i) {
-        ShowPipe(pipes[i]);
-    }
+    for (int i = 0; i < pipes.size(); ++i) ShowPipe(pipes[i]);
 }
 
 void ShowAllKompres(const vector <KS> kompres)
 {
     cout << "Компрессорные станции" << endl << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Кол-во цехов" << setw(20) << "Цехов в работе" << setw(20) << "Эффективность" << endl;
     if (kompres.size() > 0) {
-        for (int i = 0; i < kompres.size(); ++i) {
-            ShowKompres(kompres[i]);
-        }
+        for (int i = 0; i < kompres.size(); ++i) ShowKompres(kompres[i]);
     }
 }
 
-void EditPipe(pipe &pipes)
+void EditPipe(pipe &pipe)
 {
-    pipes.repair = !pipes.repair;
+    pipe.repair = !pipe.repair;
 }
 
 void EditKompres(KS &kompres, int NewCountInWork)
@@ -345,7 +342,7 @@ bool ReadFile(vector<pipe>& pipes, vector<KS>& kompres) {
             getline(fin, input);
             pipes[i].diameter = stoi(input);
             getline(fin, input);
-            pipes[i].repair;
+            pipes[i].repair = stoi(input);
         }
     }
     getline(fin, input);
@@ -409,14 +406,14 @@ int main()
         case '3':
             system("cls");
             if (pipes.size() == 0){
-                cout << setw(40) << "Трубы не были добавлены, выводить нечего" << endl;
+                cout << "Трубы не были добавлены, выводить нечего" << endl;
             }
             else {
                 ShowAllPipes(pipes);
             }
             cout << endl;
             if (kompres.size() == 0) {
-                cout << setw(40) << "Компрессорные станции не были добавлены, выводить нечего" << endl;
+                cout << "Компрессорные станции не были добавлены, выводить нечего" << endl;
             }
             else {
                 ShowAllKompres(kompres);
