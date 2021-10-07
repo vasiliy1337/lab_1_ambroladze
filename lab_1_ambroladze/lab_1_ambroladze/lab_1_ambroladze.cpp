@@ -4,6 +4,7 @@
 #include <vector>
 #include <iomanip> //setw
 #include <fstream>  //файлы
+#include <ctime> // для рандомных id
 using namespace std;
 
 struct pipe{
@@ -20,28 +21,7 @@ struct KS{
     double Efficiency;
 };
 
-string DeleteSpace(string input) {
-    if (input.length() > 0) {
-        while (input[0] == ' ') {
-            input.erase(0, 1);
-            if (input.length() == 0) {
-                break;
-            }
-        }
-    }
-    if (input.length() > 0) {
-        while (input[input.size() - 1] == ' ') {
-            input.erase(input.size() - 1, input.size());
-            if (input.length() == 0) {
-                break;
-            }
-        }
-    }
-    return input;
-}
-
 template <typename T>
-
 int SearchId(const T& vector, int id)
 {
     int i = 0;
@@ -50,6 +30,17 @@ int SearchId(const T& vector, int id)
         ++i;
     }
     return -1;
+}
+
+template <typename T>
+int CreateID(const T& vector)
+{
+    int NewID;
+    do {
+        srand((int)time(0));
+        NewID = rand();
+    } while (SearchId(vector, NewID) != -1);
+    return NewID;
 }
 
 double DoubleInput() {
@@ -82,6 +73,8 @@ void DrawMenu() {
         "5. Редактировать КС  " << endl <<
         "6. Сохранить  " << endl <<
         "7. Загрузить  " << endl <<
+        "8. Удалить трубу  " << endl <<
+        "9. Удалить КС  " << endl <<
         "0. Выход  " << endl;
 }
 
@@ -131,6 +124,7 @@ KS AddKS(unsigned int id) {
     while (true) {
         string inputStr;
         cin >> inputStr;
+        cin.ignore(10000, '\n');
         if (inputStr.length() > 0) {
             NewKompress.Name = inputStr;
             break;
@@ -216,7 +210,7 @@ void EditKompres(KS &kompres, int NewCountInWork)
 
 void EditAllPipes(vector<pipe> &pipes) {
     int id, i;
-        cout << "Введите номер трубы, которую хотите изменить: " << endl;
+        cout << "Введите id трубы, которую хотите изменить: " << endl;
         while (true) {
             id = IntInput();
             i = SearchId(pipes, id);
@@ -235,7 +229,7 @@ void EditAllPipes(vector<pipe> &pipes) {
 
 void EditAllKompres(vector<KS> &kompres) {
     int NewCountInWork, id, i;
-        cout << "Введите номер станции, которую хотите изменить: " << endl;
+        cout << "Введите id станции, которую хотите изменить: " << endl;
         while (true) {
             id = IntInput();
             i = SearchId(kompres, id);
@@ -337,6 +331,30 @@ bool ReadFile(vector<pipe>& pipes, vector<KS>& kompres, const string& FileName) 
     return true;
 }
 
+template <typename T>
+void DeleteElement(T& vector, int i)
+{
+    if (i < vector.size()) {
+        vector.erase(vector.begin() + i);
+    }
+}
+
+template <typename T>
+void Delete(T& vector)
+{
+    cout << endl << "Введите id элемента, который хотите удалить: ";
+    while (true) {
+        int id = IntInput();
+        int i = SearchId(vector, id);
+        if (i < vector.size() && i != -1) {
+            DeleteElement(vector, i);
+            cout << "Элемент с id " << id << " удален";
+            return;
+        }
+        else cout << "ID не найден";
+    }
+}
+
 int main()
 {
     setlocale(LC_CTYPE, "Russian");
@@ -344,7 +362,6 @@ int main()
     //SetConsoleOutputCP(1251);
     vector<pipe> pipes = {};
     vector<KS> kompres = {};
-    srand(1337);
     char inputmenu;
     while (true) {
         DrawMenu();
@@ -352,12 +369,14 @@ int main()
         switch (inputmenu) {
         case '1':
         {
-            pipes.push_back(AddPipeline(rand()));
+            int NewID = CreateID(pipes);
+            pipes.push_back(AddPipeline(NewID));
             break;
         }
         case '2':
         {
-            kompres.push_back(AddKS(rand()));
+            int NewID = CreateID(kompres);
+            kompres.push_back(AddKS(NewID));
             break;
         }
         case '3':
@@ -408,7 +427,7 @@ int main()
             if (CreateFile(pipes, kompres, FileName)) {
                 cout << "Данные сохранены в файл" << endl;
             }
-            else 
+            else
                 cout << "Не удалось создать файл" << endl;
             break;
         }
@@ -428,8 +447,34 @@ int main()
             }
             break;
         }
+        case '8':
+        {
+            if (pipes.size() > 0) {
+                ShowAllPipes(pipes);
+                Delete(pipes);
+                break;
+            }
+            else {
+                cout << "Трубы не были добавлены, удалять нечего" << endl;
+                break;
+            }
+        }
+        case '9':
+        {
+            if (kompres.size() > 0) {
+                ShowAllKompres(kompres);
+                Delete(kompres);
+                break;
+            }
+            else {
+                cout << "Станции не были добавлены, удалять нечего" << endl;
+                break;
+            }
+        }
         case '0':
+        {
             return 0;
+        }
         }
         cout << "\n\n\n\n\n\n\n\n\n\n";
     }
