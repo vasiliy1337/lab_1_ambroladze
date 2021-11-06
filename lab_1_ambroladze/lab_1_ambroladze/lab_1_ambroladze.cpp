@@ -5,9 +5,11 @@
 #include <fstream>  //файлы
 #include <ctime> // для рандомных id
 #include <unordered_map>
+
 using namespace std;
 
 struct pipe {
+    string Name;
     double length;
     int diameter;
     bool repair;
@@ -57,17 +59,25 @@ void DrawMenu() {
          "7. Загрузить  " << endl <<
          "8. Удалить трубу  " << endl <<
          "9. Удалить КС  " << endl <<
-         "10. Поиск КС по имени " << endl <<
-         "11. Поиск труб по признаку «в ремонте» " << endl <<
-         "12. Поиск КС по проценту незадействованных цехов " << endl <<
-         "13. Пакетное редактирование труб " << endl <<
+         "10. Фильтры/пакетное редактирование " << endl <<
          "0. Выход  " << endl <<
          "Выберите пункт меню: ";
 }
 
 pipe AddPipeline() {
     pipe NewPipe;
-    cout << "Введите характеристики трубы: " << endl;
+    cout << "Введите характеристики трубы: " << endl << "Имя: " << endl;
+    while (true) {
+        string inputStr;
+        getline(cin, inputStr);
+        inputStr.erase(0, inputStr.find_first_not_of(" \n\r\t"));
+        inputStr.erase(inputStr.find_last_not_of(" \n\r\t") + 1); //https://stackoverflow.com/a/33099753
+        if (inputStr.length() > 0) {
+            NewPipe.Name = inputStr;
+            break;
+        } else
+            cout << "Имя не может быть пустым, попробуйте еще раз: " << endl;
+    }
     cout << "Длина: " << endl;
     while (true) {
         double inputDouble = NumberInput(0.);
@@ -94,8 +104,7 @@ pipe AddPipeline() {
 
 KS AddKS() {
     KS NewKompress;
-    cout << "Введите характеристики компрессорной станции: " << endl;
-    cout << "Имя: " << endl;
+    cout << "Введите характеристики компрессорной станции: " << endl << "Имя: " << endl;
     while (true) {
         string inputStr;
         getline(cin, inputStr);
@@ -139,6 +148,7 @@ KS AddKS() {
 
 void ShowPipe(const pair<int, pipe> &pipes) {
     cout << setw(10) << pipes.first <<
+         setw(20) << pipes.second.Name <<
          setw(20) << pipes.second.length <<
          setw(20) << pipes.second.diameter <<
          setw(20) << ((pipes.second.repair == true) ? "Да" : "Нет") << endl;
@@ -152,15 +162,25 @@ void ShowKompres(const pair<int, KS> &kompres) {
          setw(20) << kompres.second.Efficiency << endl;
 }
 
+void DrawHeader(bool type) {
+    if (type)
+        cout << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(20)
+             << "В ремонте" << endl;
+    else
+        cout << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Кол-во цехов" << setw(20) << "Цехов в работе"
+             << setw(20) << "Эффективность" << endl;
+
+}
+
 void ShowAllPipes(const unordered_map<int, pipe> &pipes) {
-    cout << "Трубопроводы" << endl << setw(10) << "ID" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(20)
-         << "В ремонте" << endl;
+    cout << "Трубопроводы" << endl;
+    DrawHeader(1);
     for (auto &p: pipes) ShowPipe(p);   //for (int i = 0; i < pipes.size(); ++i) ShowPipe(pipes[i]);
 }
 
 void ShowAllKompres(const unordered_map<int, KS> &kompres) {
-    cout << "Компрессорные станции" << endl << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Кол-во цехов"
-         << setw(20) << "Цехов в работе" << setw(20) << "Эффективность" << endl;
+    cout << "Компрессорные станции" << endl;
+    DrawHeader(0);
     for (auto &p: kompres) ShowKompres(p);  //for (int i = 0; i < kompres.size(); ++i) ShowKompres(kompres[i]);
 }
 
@@ -174,14 +194,13 @@ void EditKompres(KS &kompres, int NewCountInWork) {
 }
 
 void EditAllPipes(unordered_map<int, pipe> &pipes) {
-    int id, i;
+    int id;
     cout << "Введите id трубы, которую хотите изменить: " << endl;
     while (true) {
         id = NumberInput(0);
         if (SearchId(pipes, id) != -1) {
             EditPipe(pipes[id]);
-            cout << endl << setw(10) << "ID" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(20) << "В ремонте"
-                 << endl;
+            DrawHeader(1);
             ShowPipe({id, pipes[id]});
             cout << "Успешное редактирование" << endl;
             return;
@@ -191,7 +210,7 @@ void EditAllPipes(unordered_map<int, pipe> &pipes) {
 }
 
 void EditAllKompres(unordered_map<int, KS> &kompres) {
-    int NewCountInWork, id, i;
+    int NewCountInWork, id;
     cout << "Введите id станции, которую хотите изменить: " << endl;
     while (true) {
         id = NumberInput(0);
@@ -205,8 +224,7 @@ void EditAllKompres(unordered_map<int, KS> &kompres) {
                 } else
                     cout << "Кол-во цехов в работе не может быть больше общего кол-ва цехов" << endl;
             }
-            cout << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Кол-во цехов" << setw(20)
-                 << "Цехов в работе" << setw(20) << "Эффективность" << endl;
+            DrawHeader(0);
             ShowKompres({id, kompres[id]});
             cout << "Успешное редактирование" << endl;
             return;
@@ -221,18 +239,17 @@ bool CreateFile(const unordered_map<int, pipe> &pipes, const unordered_map<int, 
     if (!fout.is_open())
         return false;
     if (pipes.size() > 0) {
-        fout << "pipe" << endl;
-        fout << pipes.size() << endl;
+        fout << "pipe" << endl << pipes.size() << endl;
         for (auto &p: pipes) {
-            fout << p.first << endl << p.second.length << endl << p.second.diameter << endl << p.second.repair << endl;
+            fout << p.first << endl << p.second.Name << endl << p.second.length << endl << p.second.diameter << endl
+                 << p.second.repair << endl;
         }
     } else {
         cout << "Трубы не были добавлены" << endl;
         fout << "nopipe" << endl;
     }
     if (kompres.size() > 0) {
-        fout << "kc" << endl;
-        fout << kompres.size() << endl;
+        fout << "kc" << endl << kompres.size() << endl;
         for (auto &k: kompres) {
             fout << k.first << endl << k.second.Name << endl << k.second.Count << endl << k.second.CountInWork << endl
                  << k.second.Efficiency << endl;
@@ -259,7 +276,11 @@ bool ReadFile(unordered_map<int, pipe> &pipes, unordered_map<int, KS> &kompres, 
         for (int i = 0; i < n; ++i) {
             pipe NewPipe;
             int id;
-            fin >> id >> NewPipe.length >> NewPipe.diameter >> NewPipe.repair;
+            fin >> id;
+            getline(fin, input);
+            getline(fin, input);
+            NewPipe.Name = input;
+            fin >> NewPipe.length >> NewPipe.diameter >> NewPipe.repair;
             pipes.insert({id, NewPipe});
         }
     }
@@ -275,15 +296,14 @@ bool ReadFile(unordered_map<int, pipe> &pipes, unordered_map<int, KS> &kompres, 
             getline(fin, input);
             getline(fin, input);
             NewKS.Name = input;
-            fin >> NewKS.Count;
-            fin >> NewKS.CountInWork;
-            fin >> NewKS.Efficiency;
+            fin >> NewKS.Count >> NewKS.CountInWork >> NewKS.Efficiency;
             kompres.insert({id, NewKS});
         }
     }
     return true;
 }
 
+// Удаление
 template<typename T>
 void DeleteElement(T &map, int id) {
     if (map.find(id) != map.end()) {
@@ -295,7 +315,7 @@ template<typename T>
 void Delete(T &map) {
     cout << endl << "Введите id элемента, который хотите удалить (или 0 чтобы вернуться в меню): ";
     while (true) {
-        int id = NumberInput(1);
+        int id = NumberInput(0);
         if (id == 0) return;
         if (SearchId(map, id) != -1) {
             DeleteElement(map, id);
@@ -307,81 +327,180 @@ void Delete(T &map) {
 }
 
 // Фильтры
-int SearchByName(const unordered_map<int, KS> &kompres, string InputName) {
-    for (auto &k: kompres) {
-        if (k.second.Name == InputName)
-            return k.first;
-    }
-    return -1;
+template<typename T>
+bool CheckByName(const T &map, string param) {
+    return map.Name == param;
 }
 
-vector<int> SearchByRepair(const unordered_map<int, pipe> &pipes, bool InRepair) {
-    vector<int> index;
-    for (auto &p: pipes) {
-        if (p.second.repair == InRepair)
-            index.push_back(p.first);
-    }
-    return index;
+bool CheckByRepair(const pipe &pipe, bool param) {
+    return pipe.repair == param;
 }
 
-vector<int> SearchByCount(const unordered_map<int, KS> &kompres, double percent) {
-    vector<int> index;
-    for (auto &k: kompres) {
-        if (round(((double(k.second.Count) - double(k.second.CountInWork)) / double(k.second.Count)) * 100) == percent)
-            index.push_back(k.first);
-    }
-    return index;
+bool CheckByPercent(const KS &kompres, double param) {
+    return round(100 * (1. * (kompres.Count - kompres.CountInWork) / kompres.Count)) == param;
 }
 
-// Пакетное редактирование
-void BatchEditingByRepair(unordered_map<int, pipe> &pipes) {
-    cout << "Какие трубы нужно редактировать (1 - в ремонте, 0 - не в ремонте): " << endl;
-    char inputChar = getchar();
-    cin.ignore(10000, '\n');
-    if (inputChar == '1' || inputChar == '0') {
-        vector<int> index = SearchByRepair(pipes, (inputChar == '1') ? true : false);
-        if (index.size() != 0) {
-            cout << "Отредактировано " << index.size() << " труб" << endl;
-            for (auto &id: index) {
-                EditPipe(pipes[id]);
-                ShowPipe({id, pipes[id]});
+template<typename T, typename T_param>
+using Filter = bool (*)(const T &map, T_param param);
+
+template<typename T, typename T_param>
+vector<int> FindByFilter(const unordered_map<int, T> &map, Filter<T, T_param> f, T_param param) {
+    vector<int> res;
+    for (auto &m: map)
+        if (f(m.second, param))
+            res.push_back(m.first);
+    return res;
+}
+
+void PipeFilterMenu(unordered_map<int, pipe> &pipes) {
+    if (pipes.size() == 0) {
+        cout << "Трубы не добавлены " << endl;
+        return;
+    }
+    while (true) {
+        cout << endl << "Фильтр/редактирование труб" << endl << "1. Поиск труб по названию" << endl
+             << "2. Поиск труб по признаку в ремонте " << endl << "3. Ввести id вручную " << endl << "0. Выход "
+             << endl;
+        int FilterCase = NumberInput(0);
+        switch (FilterCase) {
+            case 1: {
+                cout << "Введите имя, которое нужно найти: " << endl;
+                string inputName;
+                getline(cin, inputName);
+                inputName.erase(0, inputName.find_first_not_of(" \n\r\t"));
+                inputName.erase(inputName.find_last_not_of(" \n\r\t") + 1);
+                vector<int> index = FindByFilter(pipes, CheckByName, inputName);
+                if (index.size() != 0) {
+                    cout << "Найдено " << index.size() << " труб" << endl;
+                    DrawHeader(1);
+                    for (auto &id: index) {
+                        ShowPipe({id, pipes[id]});
+                    }
+                    cout << "1. Редактировать найденые" << endl;
+                    if (NumberInput(0) == 1) {
+                        for (auto &id: index)
+                            EditPipe(pipes[id]);
+                    }
+                } else
+                    cout << "Ничего не найдено " << endl;
+                break;
             }
-        } else
-            cout << "Ничего не найдено " << endl;
-    } else
-        cout << "Ошибка ввода " << endl;
-}
-
-void BatchEditingByInput(unordered_map<int, pipe> &pipes) {
-    cout << "Введите ID труб, которые нужно отредактировать: " << endl;
-    int input;
-    vector<int> edit_id;
-    do {
-        input = NumberInput(0);
-        if (SearchId(pipes, input) != -1)
-            edit_id.push_back(input);
-        //else cout << "ID " << input << " не найден " << endl;
-    } while (input != 0);
-    if (edit_id.size() != 0) {
-        cout << "Успешное редактирование " << endl;
-        for (auto &i: edit_id) {
-            EditPipe(pipes[i]);
-            ShowPipe({i, pipes[i]});
+            case 2: {
+                cout << "Какие трубы нужно искать (1 - в ремонте, 0 - не в ремонте): " << endl;
+                char inputChar = getchar();
+                cin.ignore(10000, '\n');
+                if (inputChar == '1' || inputChar == '0') {
+                    vector<int> index = FindByFilter(pipes, CheckByRepair, (inputChar == '1') ? true : false);
+                    if (index.size() != 0) {
+                        cout << "Найдено " << index.size() << " труб" << endl;
+                        DrawHeader(1);
+                        for (auto &id: index) {
+                            ShowPipe({id, pipes[id]});
+                        }
+                        cout << "1. Редактировать найденые" << endl;
+                        if (NumberInput(0) == 1)
+                            for (auto &id: index)
+                                EditPipe(pipes[id]);
+                    } else
+                        cout << "Ничего не найдено " << endl;
+                } else
+                    cout << "Ошибка ввода " << endl;
+                break;
+            }
+            case 3: {
+                cout << "Введите ID труб, которые нужно отредактировать: " << endl;
+                int input;
+                vector<int> edit_id;
+                do {
+                    input = NumberInput(0);
+                    if (SearchId(pipes, input) != -1)
+                        edit_id.push_back(input);
+                } while (input != 0);
+                if (edit_id.size() != 0) {
+                    cout << "Успешное редактирование " << endl;
+                    DrawHeader(1);
+                    for (auto &i: edit_id) {
+                        EditPipe(pipes[i]);
+                        ShowPipe({i, pipes[i]});
+                    }
+                }
+                break;
+            }
+            case 0:
+                return;
+            default:
+                cout << "Такого пункта не существует" << endl;
+                break;
         }
     }
 }
 
-void BatchEditing(unordered_map<int, pipe> &pipes) {
-    cout << "1. Поиск по признаку в ремонте \n2. Ввести ID вручную \n0. Выход \n";
+void KSFilterMenu(unordered_map<int, KS> &kompres) {
+    if (kompres.size() == 0) {
+        cout << "Трубы не добавлены " << endl;
+        return;
+    }
     while (true) {
+        cout << endl << "Фильтр по КС" << endl << "1. Поиск КС по названию" << endl
+             << "2. Поиск КС по проценту незадействованных цехов" << endl << "0. Выход" << endl;
+        int FilterCase = NumberInput(0);
+        switch (FilterCase) {
+            case 1: {
+                cout << "Введите название, которое нужно найти: " << endl;
+                string inputName;
+                getline(cin, inputName);
+                inputName.erase(0, inputName.find_first_not_of(" \n\r\t"));
+                inputName.erase(inputName.find_last_not_of(" \n\r\t") + 1);
+                vector<int> index = FindByFilter(kompres, CheckByName, inputName);
+                if (index.size() != 0) {
+                    cout << "Найдено " << index.size() << " КС" << endl;
+                    DrawHeader(0);
+                    for (auto &id: index) {
+                        ShowKompres({id, kompres[id]});
+                    }
+                } else
+                    cout << "Ничего не найдено " << endl;
+                break;
+            }
+            case 2: {
+                cout << "Введите процент нерабочих цехов: " << endl;
+                double percent = NumberInput(0.);
+                if (percent <= 100 && percent >= 0) {
+                    vector<int> index = FindByFilter(kompres, CheckByPercent, percent);
+                    if (index.size() != 0) {
+                        cout << "Найдено " << index.size() << " труб" << endl;
+                        DrawHeader(0);
+                        for (auto &id: index) {
+                            ShowKompres({id, kompres[id]});
+                        }
+                    } else
+                        cout << "Ничего не найдено " << endl;
+                } else
+                    cout << "Ошибка ввода " << endl;
+                break;
+            }
+            case 0:
+                return;
+            default:
+                cout << "Такого пункта не существует" << endl;
+                break;
+        }
+    }
+}
+
+void BatchEditing(unordered_map<int, pipe> &pipes, unordered_map<int, KS> &kompres) {
+    while (true) {
+        cout << endl << "Меню фильтров" << endl << "1. Поиск/редактирование труб " << endl << "2. Поиск КС " << endl
+             << "0. Выход " << endl;
         int edit_case = NumberInput(0);
         switch (edit_case) {
             case 1: {
-                BatchEditingByRepair(pipes);
+
+                PipeFilterMenu(pipes);
                 return;
             }
             case 2: {
-                BatchEditingByInput(pipes);
+                KSFilterMenu(kompres);
                 return;
             }
             case 0:
@@ -484,74 +603,7 @@ int main() {
                 break;
             }
             case 10: {
-                if (kompres.size() == 0) {
-                    cout << "КС не добавлены";
-                    break;
-                }
-                string inputName;
-                cout << "Введите имя, которое нужно найти: " << endl;
-                getline(cin, inputName);
-                inputName.erase(0, inputName.find_first_not_of(" \n\r\t"));
-                inputName.erase(inputName.find_last_not_of(" \n\r\t") + 1);
-                int id = SearchByName(kompres, inputName);
-                if (id != -1) {
-                    cout << "Найдена КС" << endl << setw(10) << "ID" << setw(20) << "Название" << setw(20)
-                         << "Кол-во цехов" << setw(20) << "Цехов в работе" << setw(20) << "Эффективность" << endl;
-                    ShowKompres({id, kompres[id]});
-                } else
-                    cout << "Ничего не найдено ";
-                break;
-            }
-            case 11: {
-                if (pipes.size() == 0) {
-                    cout << "Трубы не добавлены";
-                    break;
-                }
-                cout << "Какие трубы нужно искать (1 - в ремонте, 0 - не в ремонте): " << endl;
-                char inputChar = getchar();
-                cin.ignore(10000, '\n');
-                if (inputChar == '1' || inputChar == '0') {
-                    vector<int> index = SearchByRepair(pipes, (inputChar == '1') ? true : false);
-                    if (index.size() != 0) {
-                        cout << "Найдено " << index.size() << " труб" << endl << setw(10) << "ID" << setw(20) << "Длина"
-                             << setw(20) << "Диаметр" << setw(20) << "В ремонте" << endl;
-                        for (auto &id: index) {
-                            ShowPipe({id, pipes[id]});
-                        }
-                    } else
-                        cout << "Ничего не найдено ";
-                } else
-                    cout << "Ошибка ввода ";
-                break;
-            }
-            case 12: {
-                if (kompres.size() == 0) {
-                    cout << "КС не добавлены";
-                    break;
-                }
-                cout << "Введите процент незадействованных цехов: ";
-                double percent = NumberInput(0.);
-                if (percent <= 100 && percent >= 0) {
-                    vector<int> index = SearchByCount(kompres, percent);
-                    if (index.size() != 0) {
-                        cout << "Найдено " << index.size() << " КС" << endl << setw(10) << "ID" << setw(20)
-                             << "Название" << setw(20) << "Кол-во цехов" << setw(20) << "Цехов в работе" << setw(20)
-                             << "Эффективность" << endl;
-                        for (auto &id: index) {
-                            ShowKompres({id, kompres[id]});
-                        }
-                    } else
-                        cout << "Ничего не найдено ";
-                } else
-                    cout << "Ошибка ввода ";
-                break;
-            }
-            case 13: {
-                if (pipes.size() == 0) {
-                    cout << "Трубы не добавлены";
-                    break;
-                }
-                BatchEditing(pipes);
+                BatchEditing(pipes, kompres);
                 break;
             }
             case 0: {
