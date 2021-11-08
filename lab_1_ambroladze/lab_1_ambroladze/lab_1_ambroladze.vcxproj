@@ -139,7 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="KS.cpp" />
     <ClCompile Include="lab_1_ambroladze.cpp" />
+    <ClCompile Include="pipe.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="KS.h" />
+    <ClInclude Include="pipe.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
