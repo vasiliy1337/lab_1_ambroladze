@@ -16,6 +16,10 @@ public :
     void edit();
     bool islinked() const;
     void showlink(int ID) const;
+    void save(ofstream& out) const;
+    void load(ifstream&);
+    void show(int id) const;
+   /* friend std::ostream& operator << (ostream& out, const pipe& p);*/
     pipe();
 };
 

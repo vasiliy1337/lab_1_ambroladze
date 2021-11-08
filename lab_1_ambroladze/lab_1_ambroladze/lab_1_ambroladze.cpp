@@ -150,22 +150,6 @@ KS AddKS() {
     return NewKompress;
 }
 
-void ShowPipe(const pair<int, pipe> &pipes) {
-    cout << setw(10) << pipes.first <<
-         setw(20) << pipes.second.name <<
-         setw(20) << pipes.second.length <<
-         setw(20) << pipes.second.diameter <<
-         setw(20) << ((pipes.second.repair == true) ? "Да" : "Нет") << endl;
-}
-
-void ShowKompres(const pair<int, KS> &kompres) {
-    cout << setw(10) << kompres.first <<
-         setw(20) << kompres.second.Name <<
-         setw(20) << kompres.second.Count <<
-         setw(20) << kompres.second.CountInWork <<
-         setw(20) << kompres.second.Efficiency << endl;
-}
-
 void DrawHeader(bool type) {
     if (type)
         cout << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(20)
@@ -178,13 +162,13 @@ void DrawHeader(bool type) {
 void ShowAllPipes(const unordered_map<int, pipe> &pipes) {
     cout << "Трубопроводы" << endl;
     DrawHeader(1);
-    for (auto &p: pipes) ShowPipe(p);   //for (int i = 0; i < pipes.size(); ++i) ShowPipe(pipes[i]);
+    for (auto &p: pipes) p.second.show(p.first);   //for (int i = 0; i < pipes.size(); ++i) ShowPipe(pipes[i]);
 }
 
 void ShowAllKompres(const unordered_map<int, KS> &kompres) {
     cout << "Компрессорные станции" << endl;
     DrawHeader(0);
-    for (auto &p: kompres) ShowKompres(p);  //for (int i = 0; i < kompres.size(); ++i) ShowKompres(kompres[i]);
+    for (auto &p: kompres) p.second.show(p.first);  //for (int i = 0; i < kompres.size(); ++i) ShowKompres(kompres[i]);
 }
 
 void EditAllPipes(unordered_map<int, pipe> &pipes) {
@@ -195,7 +179,7 @@ void EditAllPipes(unordered_map<int, pipe> &pipes) {
         if (SearchId(pipes, id) != -1) {
             pipes[id].edit();
             DrawHeader(1);
-            ShowPipe({id, pipes[id]});
+            pipes[id].show(id);
             cout << "Успешное редактирование" << endl;
             return;
         } else
@@ -219,7 +203,7 @@ void EditAllKompres(unordered_map<int, KS> &kompres) {
                     cout << "Кол-во цехов в работе не может быть больше общего кол-ва цехов" << endl;
             }
             DrawHeader(0);
-            ShowKompres({id, kompres[id]});
+            kompres[id].show(id);
             cout << "Успешное редактирование" << endl;
             return;
         } else
@@ -235,8 +219,8 @@ bool CreateFile(const unordered_map<int, pipe> &pipes, const unordered_map<int, 
     if (pipes.size() > 0) {
         fout << "pipe" << endl << pipes.size() << endl;
         for (auto &p: pipes) {
-            fout << p.first << endl << p.second.name << endl << p.second.length << endl << p.second.diameter << endl
-                 << p.second.repair << endl;
+            fout << p.first << endl;
+            p.second.save(fout);
         }
     } else {
         cout << "Трубы не были добавлены" << endl;
@@ -245,8 +229,8 @@ bool CreateFile(const unordered_map<int, pipe> &pipes, const unordered_map<int, 
     if (kompres.size() > 0) {
         fout << "kc" << endl << kompres.size() << endl;
         for (auto &k: kompres) {
-            fout << k.first << endl << k.second.Name << endl << k.second.Count << endl << k.second.CountInWork << endl
-                 << k.second.Efficiency << endl;
+            fout << k.first << endl;
+            k.second.save(fout);
         }
     } else {
         cout << "КС не были добавлены" << endl;
@@ -271,10 +255,7 @@ bool ReadFile(unordered_map<int, pipe> &pipes, unordered_map<int, KS> &kompres, 
             pipe NewPipe;
             int id;
             fin >> id;
-            getline(fin, input);
-            getline(fin, input);
-            NewPipe.name = input;
-            fin >> NewPipe.length >> NewPipe.diameter >> NewPipe.repair;
+            NewPipe.load(fin);
             pipes.insert({id, NewPipe});
         }
     }
@@ -287,10 +268,7 @@ bool ReadFile(unordered_map<int, pipe> &pipes, unordered_map<int, KS> &kompres, 
             KS NewKS;
             int id;
             fin >> id;
-            getline(fin, input);
-            getline(fin, input);
-            NewKS.Name = input;
-            fin >> NewKS.Count >> NewKS.CountInWork >> NewKS.Efficiency;
+            NewKS.load(fin);
             kompres.insert({id, NewKS});
         }
     }
@@ -374,7 +352,7 @@ void PipeFilterMenu(unordered_map<int, pipe> &pipes) {
                 cout << "Найдено " << index.size() << " труб" << endl;
                 DrawHeader(1);
                 for (auto &id: index)
-                    ShowPipe({id, pipes[id]});
+                    pipes[id].show(id);
                 cout << "Редактировать найденые? (1-да)" << endl;
                 if (NumberInput(0) == 1) {
                     for (auto &id: index)
@@ -394,7 +372,7 @@ void PipeFilterMenu(unordered_map<int, pipe> &pipes) {
                     cout << "Найдено " << index.size() << " труб" << endl;
                     DrawHeader(1);
                     for (auto &id: index)
-                        ShowPipe({id, pipes[id]});
+                        pipes[id].show(id);
                     cout << "Редактировать найденые? (1-да)" << endl;
                     if (NumberInput(0) == 1)
                         for (auto &id: index)
@@ -419,7 +397,7 @@ void PipeFilterMenu(unordered_map<int, pipe> &pipes) {
                 DrawHeader(1);
                 for (auto &id: edit_id) {
                     pipes[id].edit();
-                    ShowPipe({id, pipes[id]});
+                    pipes[id].show(id);
                 }
             }
             return;
@@ -449,7 +427,7 @@ void KSFilterMenu(unordered_map<int, KS> &kompres) {
             cout << "Найдено " << index.size() << " КС" << endl;
             DrawHeader(0);
             for (auto &id: index) {
-                ShowKompres({id, kompres[id]});
+                kompres[id].show(id);
             }
         } else
             cout << "Ничего не найдено " << endl;
@@ -462,7 +440,7 @@ void KSFilterMenu(unordered_map<int, KS> &kompres) {
                 cout << "Найдено " << index.size() << " труб" << endl;
                 DrawHeader(0);
                 for (auto &id: index) {
-                    ShowKompres({id, kompres[id]});
+                    kompres[id].show(id);
                 }
             } else
                 cout << "Ничего не найдено " << endl;
