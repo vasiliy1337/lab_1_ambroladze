@@ -7,21 +7,10 @@
 #include <unordered_map>
 #include "pipe.h"
 #include "KS.h"
+#include "input.h"
+#include "input.h"
 
 using namespace std;
-
-//struct pipe {
-//    string Name;
-//    double length;
-//    int diameter;
-//    bool repair;
-//};
-
-//struct KS {
-//    string Name;
-//    int Count, CountInWork;
-//    double Efficiency;
-//};
 
 template<typename T>
 int SearchId(const T &map, int id) {
@@ -37,18 +26,6 @@ int CreateID(const T &map) {
         NewID = rand();
     } while (SearchId(map, NewID) != -1);
     return NewID;
-}
-
-template<typename T>
-T NumberInput(T min) {
-    T input;
-    while (!(cin >> input) || input < min) {
-        cin.clear();
-        cin.ignore(10000, '\n');
-        cout << "Введен неверный символ, попробуйте еще раз: ";
-    }
-    cin.ignore(10000, '\n');
-    return input;
 }
 
 void DrawMenu() {
@@ -68,88 +45,6 @@ void DrawMenu() {
          "Выберите пункт меню: ";
 }
 
-pipe AddPipeline() {
-    pipe NewPipe;
-    cout << "Введите характеристики трубы: " << endl << "Имя: " << endl;
-    while (true) {
-        string inputStr;
-        getline(cin, inputStr);
-        inputStr.erase(0, inputStr.find_first_not_of(" \n\r\t"));
-        inputStr.erase(inputStr.find_last_not_of(" \n\r\t") + 1); //https://stackoverflow.com/a/33099753
-        if (inputStr.length() > 0) {
-            NewPipe.name = inputStr;
-            break;
-        } else
-            cout << "Имя не может быть пустым, попробуйте еще раз: " << endl;
-    }
-    cout << "Длина: " << endl;
-    while (true) {
-        double inputDouble = NumberInput(0.);
-        if (inputDouble > 0) {
-            NewPipe.length = inputDouble;
-            break;
-        } else cout << "Длина не может быть нулевой" << endl;
-    }
-    cout << "Диаметр: " << endl;
-    int inputInt = NumberInput(1);
-    NewPipe.diameter = inputInt;
-    cout << "Введите 1, если труба в ремонте, или 0, если труба не в ремонте: " << endl;
-    while (true) {
-        char inputChar = getchar();
-        cin.ignore(10000, '\n');
-        if (inputChar == '1' || inputChar == '0') {
-            NewPipe.repair = (inputChar == '1') ? true : false;
-            break;
-        } else
-            cout << "Введен некорректный символ, попробуйте еще раз: " << endl;
-    }
-    return NewPipe;
-}
-
-KS AddKS() {
-    KS NewKompress;
-    cout << "Введите характеристики компрессорной станции: " << endl << "Имя: " << endl;
-    while (true) {
-        string inputStr;
-        getline(cin, inputStr);
-        inputStr.erase(0, inputStr.find_first_not_of(" \n\r\t"));
-        inputStr.erase(inputStr.find_last_not_of(" \n\r\t") + 1); //https://stackoverflow.com/a/33099753
-        if (inputStr.length() > 0) {
-            NewKompress.Name = inputStr;
-            break;
-        } else
-            cout << "Имя не может быть пустым, попробуйте еще раз: " << endl;
-    }
-    cout << "Кол-во цехов: " << endl;
-    while (true) {
-        int inputInt = NumberInput(0);
-        if (inputInt > 0) {
-            NewKompress.Count = inputInt;
-            break;
-        } else
-            cout << "Кол-во цехов не может быть нулевым, попробуйте еще раз: " << endl;
-    }
-    cout << "Кол-во цехов в работе: " << endl;
-    while (true) {
-        int inputInt = NumberInput(0);
-        if (inputInt <= NewKompress.Count) {
-            NewKompress.CountInWork = inputInt;
-            break;
-        } else
-            cout << "Кол-во цехов в работе не может быть больше общего кол-ва цехов: " << endl;
-    }
-    cout << "Эффективность: " << endl;
-    while (true) {
-        double inputDouble = NumberInput(0.);
-        if (inputDouble >= 0. && inputDouble <= 1.) {
-            NewKompress.Efficiency = inputDouble;
-            break;
-        } else
-            cout << "Эффективность должна находиться в пределах от 0 до 1: " << endl;
-    }
-    return NewKompress;
-}
-
 void DrawHeader(bool type) {
     if (type)
         cout << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(20)
@@ -162,13 +57,13 @@ void DrawHeader(bool type) {
 void ShowAllPipes(const unordered_map<int, pipe> &pipes) {
     cout << "Трубопроводы" << endl;
     DrawHeader(1);
-    for (auto &p: pipes) p.second.show(p.first);   //for (int i = 0; i < pipes.size(); ++i) ShowPipe(pipes[i]);
+    for (auto &p: pipes) cout << setw(10) << p.first << p.second;
 }
 
 void ShowAllKompres(const unordered_map<int, KS> &kompres) {
     cout << "Компрессорные станции" << endl;
     DrawHeader(0);
-    for (auto &p: kompres) p.second.show(p.first);  //for (int i = 0; i < kompres.size(); ++i) ShowKompres(kompres[i]);
+    for (auto &k: kompres) cout << setw(10) << k.first << k.second;
 }
 
 void EditAllPipes(unordered_map<int, pipe> &pipes) {
@@ -179,7 +74,7 @@ void EditAllPipes(unordered_map<int, pipe> &pipes) {
         if (SearchId(pipes, id) != -1) {
             pipes[id].edit();
             DrawHeader(1);
-            pipes[id].show(id);
+            cout << setw(10) << id << pipes[id];
             cout << "Успешное редактирование" << endl;
             return;
         } else
@@ -203,7 +98,7 @@ void EditAllKompres(unordered_map<int, KS> &kompres) {
                     cout << "Кол-во цехов в работе не может быть больше общего кол-ва цехов" << endl;
             }
             DrawHeader(0);
-            kompres[id].show(id);
+            cout << setw(10) << id << kompres[id];
             cout << "Успешное редактирование" << endl;
             return;
         } else
@@ -352,7 +247,7 @@ void PipeFilterMenu(unordered_map<int, pipe> &pipes) {
                 cout << "Найдено " << index.size() << " труб" << endl;
                 DrawHeader(1);
                 for (auto &id: index)
-                    pipes[id].show(id);
+                    cout << setw(10) << id << pipes[id];
                 cout << "Редактировать найденые? (1-да)" << endl;
                 if (NumberInput(0) == 1) {
                     for (auto &id: index)
@@ -372,7 +267,7 @@ void PipeFilterMenu(unordered_map<int, pipe> &pipes) {
                     cout << "Найдено " << index.size() << " труб" << endl;
                     DrawHeader(1);
                     for (auto &id: index)
-                        pipes[id].show(id);
+                        cout << setw(10) << id << pipes[id];
                     cout << "Редактировать найденые? (1-да)" << endl;
                     if (NumberInput(0) == 1)
                         for (auto &id: index)
@@ -397,7 +292,7 @@ void PipeFilterMenu(unordered_map<int, pipe> &pipes) {
                 DrawHeader(1);
                 for (auto &id: edit_id) {
                     pipes[id].edit();
-                    pipes[id].show(id);
+                    cout << setw(10) << id << pipes[id];
                 }
             }
             return;
@@ -427,7 +322,7 @@ void KSFilterMenu(unordered_map<int, KS> &kompres) {
             cout << "Найдено " << index.size() << " КС" << endl;
             DrawHeader(0);
             for (auto &id: index) {
-                kompres[id].show(id);
+                cout << setw(10) << id << kompres[id];
             }
         } else
             cout << "Ничего не найдено " << endl;
@@ -440,7 +335,7 @@ void KSFilterMenu(unordered_map<int, KS> &kompres) {
                 cout << "Найдено " << index.size() << " труб" << endl;
                 DrawHeader(0);
                 for (auto &id: index) {
-                    kompres[id].show(id);
+                    cout << setw(10) << id << kompres[id];
                 }
             } else
                 cout << "Ничего не найдено " << endl;
@@ -461,12 +356,16 @@ int main() {
         switch (inputmenu) {
             case 1: {
                 int NewID = CreateID(pipes);
-                pipes.insert({NewID, AddPipeline()});
+                pipe NewPipe;
+                cin >> NewPipe;
+                pipes.insert({NewID, NewPipe});
                 break;
             }
             case 2: {
                 int NewID = CreateID(kompres);
-                kompres.insert({NewID, AddKS()});
+                KS NewKS;
+                cin >> NewKS;
+                kompres.insert({NewID, NewKS});
                 break;
             }
             case 3: {
@@ -558,7 +457,7 @@ int main() {
                     int out = SearchId(kompres, NumberInput(0));
                     cout << "Введите ID КС, куда входит труба: " << endl;
                     int in = SearchId(kompres, NumberInput(0));
-                    if (pipeId != -1 && in != -1 && out != -1 && in != out) {
+                    if (pipeId != -1 && pipes[pipeId].in == 0 && pipes[pipeId].out == 0 && in != -1 && out != -1 && in != out) {
                         pipes[pipeId].link(in, out);
                         cout << "Объекты соединены " << endl;
                     } else
