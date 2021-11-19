@@ -10,11 +10,13 @@ using namespace std;
 
 class pipe {
 public :
-    string name;
+    string Name;
     double length;
     int diameter;
     bool repair;
     int in, out;
+
+    static void DrawHeader();
 
     void link(int IdStart, int IdEnd);
 
@@ -24,13 +26,13 @@ public :
 
     void showlink(int ID) const;
 
-    void save(ofstream &out) const;
+    friend ostream &operator<<(ostream &out, const pipe &p);
 
-    void load(ifstream &);
+    friend ofstream& operator<<(ofstream& fout, const pipe& p);
 
-    friend std::ostream &operator<<(ostream &out, const pipe &p);
+    friend istream &operator>>(istream &in, pipe &NewPipe);
 
-    friend std::istream &operator>>(istream &in, pipe &NewPipe);
+    friend ifstream& operator>>(ifstream& fin, pipe& NewPipe);
 
     pipe();
 };
