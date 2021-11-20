@@ -20,11 +20,11 @@ public:
 
     friend ostream &operator<<(ostream &out, const KS &k);
 
-    friend ofstream& operator<<(ofstream& fout, const KS& k);
+    friend ofstream &operator<<(ofstream &fout, const KS &k);
 
     friend istream &operator>>(istream &in, KS &NewKS);
 
-    friend ifstream& operator>>(ifstream& fin, KS& NewKS);
+    friend ifstream &operator>>(ifstream &fin, KS &NewKS);
 
     KS();
 };

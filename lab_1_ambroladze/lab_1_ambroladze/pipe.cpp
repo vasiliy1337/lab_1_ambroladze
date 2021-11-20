@@ -4,7 +4,7 @@ using namespace std;
 
 void pipe::DrawHeader() {
     cout << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(20)
-        << "В ремонте" << endl;
+         << "В ремонте" << endl;
 }
 
 void pipe::link(int in, int out) {
@@ -33,7 +33,7 @@ ostream &operator<<(std::ostream &out, const pipe &p) {
     return out;
 }
 
-istream& operator>>(istream& in, pipe& NewPipe) {
+istream &operator>>(istream &in, pipe &NewPipe) {
     cout << "Введите характеристики трубы: " << endl << "Имя: " << endl;
     NewPipe.Name = input::StrInput();
     cout << "Длина: " << endl;
@@ -45,19 +45,17 @@ istream& operator>>(istream& in, pipe& NewPipe) {
     return in;
 }
 
-ofstream& operator<<(ofstream& fout, const pipe& p)
-{
+ofstream &operator<<(ofstream &fout, const pipe &p) {
     fout << p.Name << endl
-        << p.length << endl
-        << p.diameter << endl
-        << p.repair << endl
-        << p.in << endl
-        << p.out << endl;
+         << p.length << endl
+         << p.diameter << endl
+         << p.repair << endl
+         << p.in << endl
+         << p.out << endl;
     return fout;
 }
 
-ifstream& operator>>(ifstream& fin, pipe& NewPipe)
-{
+ifstream &operator>>(ifstream &fin, pipe &NewPipe) {
     string input;
     getline(fin, input);
     getline(fin, input);

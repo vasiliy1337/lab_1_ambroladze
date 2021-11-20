@@ -4,7 +4,7 @@ using namespace std;
 
 void KS::DrawHeader() {
     cout << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Кол-во цехов" << setw(20) << "Цехов в работе"
-        << setw(20) << "Эффективность" << endl;
+         << setw(20) << "Эффективность" << endl;
 }
 
 void KS::edit(int NewCountInWork) {
@@ -20,16 +20,15 @@ std::ostream &operator<<(ostream &out, const KS &k) {
     return out;
 }
 
-std::ofstream& operator<<(ofstream& fout, const KS& k)
-{
+std::ofstream &operator<<(ofstream &fout, const KS &k) {
     fout << k.Name << endl
-        << k.Count << endl
-        << k.CountInWork << endl
-        << k.Efficiency << endl;
+         << k.Count << endl
+         << k.CountInWork << endl
+         << k.Efficiency << endl;
     return fout;
 }
 
-std::istream& operator>>(istream& in, KS& NewKS) {
+std::istream &operator>>(istream &in, KS &NewKS) {
     cout << "Введите характеристики компрессорной станции: " << endl << "Имя: " << endl;
     NewKS.Name = input::StrInput();
     cout << "Кол-во цехов: " << endl;
@@ -41,8 +40,7 @@ std::istream& operator>>(istream& in, KS& NewKS) {
     return in;
 }
 
-std::ifstream& operator>>(ifstream& fin, KS& NewKS)
-{
+std::ifstream &operator>>(ifstream &fin, KS &NewKS) {
     string input;
     getline(fin, input);
     getline(fin, input);

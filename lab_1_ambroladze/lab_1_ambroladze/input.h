@@ -1,14 +1,15 @@
 #pragma once
+
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-class input
-{
+class input {
 public:
     template<typename T>
     static T NumberInput(T min = T(INT_MIN), T max = T(INT_MAX));
+
     static string StrInput();
 
 };
