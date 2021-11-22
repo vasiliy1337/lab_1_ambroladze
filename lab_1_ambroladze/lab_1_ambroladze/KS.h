@@ -13,6 +13,7 @@ public:
     string Name;
     int Count, CountInWork;
     double Efficiency;
+    //bool connected;
 
     static void DrawHeader();
 

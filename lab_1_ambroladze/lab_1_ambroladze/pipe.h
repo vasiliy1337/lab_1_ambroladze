@@ -24,6 +24,8 @@ public :
 
     bool islinked() const;
 
+    bool CanBeUsed() const;
+
     void showlink(int ID) const;
 
     friend ostream &operator<<(ostream &out, const pipe &p);

@@ -7,9 +7,12 @@ void pipe::DrawHeader() {
          << "В ремонте" << endl;
 }
 
-void pipe::link(int in, int out) {
-    this->out = out;
-    this->in = in;
+void pipe::link(int newIn, int newOut) {
+    if (in == 0 && out == 0 && newIn != -1 && newOut != -1 && newOut != newIn) {
+        out = newOut;
+        in = newIn;
+    } else
+        cout << "Ошибка" << endl;
 }
 
 void pipe::edit() {
@@ -17,11 +20,15 @@ void pipe::edit() {
 }
 
 bool pipe::islinked() const {
-    return in > 0 && out > 0;   // && repair == false
+    return in > 0 && out > 0;
+}
+
+bool pipe::CanBeUsed() const {
+    return in > 0 && out > 0 && repair == false;
 }
 
 void pipe::showlink(int ID) const {
-    cout << "КС " << out << " -> труба " << ID << " -> КС " << in << ((repair == false) ? " В ремонте " : " Работает ")
+    cout << "КС " << out << " -> труба " << ID << " -> КС " << in << ((repair == true) ? " В ремонте " : " Работает ")
          << endl;
 }
 
@@ -35,13 +42,13 @@ ostream &operator<<(std::ostream &out, const pipe &p) {
 
 istream &operator>>(istream &in, pipe &NewPipe) {
     cout << "Введите характеристики трубы: " << endl << "Имя: " << endl;
-    NewPipe.Name = input::StrInput();
+    NewPipe.Name = StrInput();
     cout << "Длина: " << endl;
-    NewPipe.length = input::NumberInput(0.01);
+    NewPipe.length = NumberInput(0.01);
     cout << "Диаметр: " << endl;
-    NewPipe.diameter = input::NumberInput(1);
+    NewPipe.diameter = NumberInput(1);
     cout << "Введите 1, если труба в ремонте, или 0, если труба не в ремонте: " << endl;
-    NewPipe.repair = (input::NumberInput(0, 1) == 1) ? true : false;
+    NewPipe.repair = (NumberInput(0, 1) == 1) ? true : false;
     return in;
 }
 
@@ -56,10 +63,8 @@ ofstream &operator<<(ofstream &fout, const pipe &p) {
 }
 
 ifstream &operator>>(ifstream &fin, pipe &NewPipe) {
-    string input;
-    getline(fin, input);
-    getline(fin, input);
-    NewPipe.Name = input;
+    fin >> ws;
+    getline(fin, NewPipe.Name);
     fin >> NewPipe.length >> NewPipe.diameter >> NewPipe.repair >> NewPipe.in >> NewPipe.out;
     return fin;
 }

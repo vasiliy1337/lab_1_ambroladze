@@ -30,13 +30,13 @@ std::ofstream &operator<<(ofstream &fout, const KS &k) {
 
 std::istream &operator>>(istream &in, KS &NewKS) {
     cout << "Введите характеристики компрессорной станции: " << endl << "Имя: " << endl;
-    NewKS.Name = input::StrInput();
+    NewKS.Name = StrInput();
     cout << "Кол-во цехов: " << endl;
-    NewKS.Count = input::NumberInput(1);
+    NewKS.Count = NumberInput(1);
     cout << "Кол-во цехов в работе: " << endl;
-    NewKS.CountInWork = input::NumberInput(1, NewKS.Count);
+    NewKS.CountInWork = NumberInput(1, NewKS.Count);
     cout << "Эффективность: " << endl;
-    NewKS.Efficiency = input::NumberInput(0., 1.);
+    NewKS.Efficiency = NumberInput(0., 1.);
     return in;
 }
 
