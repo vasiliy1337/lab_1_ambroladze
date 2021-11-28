@@ -1,4 +1,4 @@
-#include "input.h"
+ï»¿#include "input.h"
 
 using namespace std;
 
@@ -10,7 +10,7 @@ string StrInput() {
         inputStr.erase(inputStr.find_last_not_of(" \n\r\t") + 1);
         if (inputStr.size() != 0)
             break;
-        cout << "Ñòðîêà íå ìîæåò áûòü ïóñòîé, ïîïðîáóéòå åùå ðàç: ";
+        cout << "Ð¡Ñ‚Ñ€Ð¾ÐºÐ° Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿ÑƒÑÑ‚Ð¾Ð¹, Ð¿Ð¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹Ñ‚Ðµ ÐµÑ‰Ðµ Ñ€Ð°Ð·: ";
     }
     return inputStr;
 }

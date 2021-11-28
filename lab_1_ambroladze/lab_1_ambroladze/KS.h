@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iostream>
 #include <string>
@@ -10,12 +10,19 @@ using namespace std;
 
 class KS {
 public:
+    static int MaxId;
     string Name;
     int Count, CountInWork;
     double Efficiency;
-    //bool connected;
+    bool connected;
 
     static void DrawHeader();
+
+    void createLink();
+
+    void ClearLink();
+
+    bool linked();
 
     void edit(int NewCountInWork);
 

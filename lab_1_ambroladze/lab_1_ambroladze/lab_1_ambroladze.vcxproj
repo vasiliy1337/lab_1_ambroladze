@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Gts.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="KS.cpp" />
@@ -147,6 +148,7 @@
     <ClCompile Include="pipe.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Filter.h" />
     <ClInclude Include="Gts.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="KS.h" />

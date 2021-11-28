@@ -1,25 +1,32 @@
-#include "pipe.h"
+п»ї#include "pipe.h"
 
 using namespace std;
 
+int pipe::MaxId = 0;
+
 void pipe::DrawHeader() {
-    cout << setw(10) << "ID" << setw(20) << "Название" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(20)
-         << "В ремонте" << endl;
+    cout << setw(10) << "ID" << setw(20) << "РќР°Р·РІР°РЅРёРµ" << setw(20) << "Р”Р»РёРЅР°" << setw(20) << "Р”РёР°РјРµС‚СЂ" << setw(20)
+         << "Р’ СЂРµРјРѕРЅС‚Рµ" << endl;
 }
 
 void pipe::link(int newIn, int newOut) {
-    if (in == 0 && out == 0 && newIn != -1 && newOut != -1 && newOut != newIn) {
+    if (in == 0 && out == 0 && newOut != newIn) {
         out = newOut;
         in = newIn;
     } else
-        cout << "Ошибка" << endl;
+        cout << "РћС€РёР±РєР°" << endl;
+}
+
+void pipe::ClearLink() {
+    out = 0;
+    in = 0;
 }
 
 void pipe::edit() {
     repair = !repair;
 }
 
-bool pipe::islinked() const {
+bool pipe::linked() const {
     return in > 0 && out > 0;
 }
 
@@ -28,7 +35,7 @@ bool pipe::CanBeUsed() const {
 }
 
 void pipe::showlink(int ID) const {
-    cout << "КС " << out << " -> труба " << ID << " -> КС " << in << ((repair == true) ? " В ремонте " : " Работает ")
+    cout << "РљРЎ " << out << " -> С‚СЂСѓР±Р° " << ID << " -> РљРЎ " << in << ((repair == true) ? " Р’ СЂРµРјРѕРЅС‚Рµ " : " Р Р°Р±РѕС‚Р°РµС‚ ")
          << endl;
 }
 
@@ -36,18 +43,18 @@ ostream &operator<<(std::ostream &out, const pipe &p) {
     out << setw(20) << p.Name <<
         setw(20) << p.length <<
         setw(20) << p.diameter <<
-        setw(20) << ((p.repair == true) ? "Да" : "Нет") << endl;
+        setw(20) << ((p.repair == true) ? "Р”Р°" : "РќРµС‚") << endl;
     return out;
 }
 
 istream &operator>>(istream &in, pipe &NewPipe) {
-    cout << "Введите характеристики трубы: " << endl << "Имя: " << endl;
+    cout << "Р’РІРµРґРёС‚Рµ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё С‚СЂСѓР±С‹: " << endl << "РРјСЏ: " << endl;
     NewPipe.Name = StrInput();
-    cout << "Длина: " << endl;
+    cout << "Р”Р»РёРЅР°: " << endl;
     NewPipe.length = NumberInput(0.01);
-    cout << "Диаметр: " << endl;
+    cout << "Р”РёР°РјРµС‚СЂ: " << endl;
     NewPipe.diameter = NumberInput(1);
-    cout << "Введите 1, если труба в ремонте, или 0, если труба не в ремонте: " << endl;
+    cout << "Р’РІРµРґРёС‚Рµ 1, РµСЃР»Рё С‚СЂСѓР±Р° РІ СЂРµРјРѕРЅС‚Рµ, РёР»Рё 0, РµСЃР»Рё С‚СЂСѓР±Р° РЅРµ РІ СЂРµРјРѕРЅС‚Рµ: " << endl;
     NewPipe.repair = (NumberInput(0, 1) == 1) ? true : false;
     return in;
 }

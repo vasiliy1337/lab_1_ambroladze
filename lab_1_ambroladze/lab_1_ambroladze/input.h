@@ -1,16 +1,14 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-    template<typename T>
-    T NumberInput(T min = T(INT_MIN), T max = T(INT_MAX));
+template<typename T>
+T NumberInput(T min = T(INT_MIN), T max = T(INT_MAX));
 
-    string StrInput();
-
-
+string StrInput();
 
 template<typename T>
 T NumberInput(T min, T max) {
@@ -18,7 +16,7 @@ T NumberInput(T min, T max) {
     while (!(cin >> input) || input < min || input > max) {
         cin.clear();
         cin.ignore(10000, '\n');
-        cout << "Ââåäåí íåâåðíûé ñèìâîë, ïîïðîáóéòå åùå ðàç: ";
+        cout << "Ð’Ð²ÐµÐ´ÐµÐ½ Ð½ÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ ÑÐ¸Ð¼Ð²Ð¾Ð», Ð¿Ð¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹Ñ‚Ðµ ÐµÑ‰Ðµ Ñ€Ð°Ð·: ";
     }
     cin.ignore(10000, '\n');
     return input;

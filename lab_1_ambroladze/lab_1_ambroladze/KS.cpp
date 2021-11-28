@@ -1,10 +1,28 @@
-#include "KS.h"
+ï»¿#include "KS.h"
 
 using namespace std;
 
+int KS::MaxId = 0;
+
 void KS::DrawHeader() {
-    cout << setw(10) << "ID" << setw(20) << "Íàçâàíèå" << setw(20) << "Êîë-âî öåõîâ" << setw(20) << "Öåõîâ â ðàáîòå"
-         << setw(20) << "Ýôôåêòèâíîñòü" << endl;
+    cout << setw(10) << "ID" << setw(20) << "ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ" << setw(20) << "ÐšÐ¾Ð»-Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð²" << setw(20) << "Ð¦ÐµÑ…Ð¾Ð² Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ðµ"
+         << setw(20) << "Ð­Ñ„Ñ„ÐµÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚ÑŒ" << endl;
+}
+
+void KS::createLink()
+{
+    if (!connected)
+        connected = true;
+}
+
+void KS::ClearLink()
+{
+    connected = false;
+}
+
+bool KS::linked()
+{
+    return connected;
 }
 
 void KS::edit(int NewCountInWork) {
@@ -24,28 +42,27 @@ std::ofstream &operator<<(ofstream &fout, const KS &k) {
     fout << k.Name << endl
          << k.Count << endl
          << k.CountInWork << endl
-         << k.Efficiency << endl;
+         << k.Efficiency << endl
+         << (k.connected == true ? '1' : '0') << endl;
     return fout;
 }
 
 std::istream &operator>>(istream &in, KS &NewKS) {
-    cout << "Ââåäèòå õàðàêòåðèñòèêè êîìïðåññîðíîé ñòàíöèè: " << endl << "Èìÿ: " << endl;
+    cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸ ÐºÐ¾Ð¼Ð¿Ñ€ÐµÑÑÐ¾Ñ€Ð½Ð¾Ð¹ ÑÑ‚Ð°Ð½Ñ†Ð¸Ð¸: " << endl << "Ð˜Ð¼Ñ: " << endl;
     NewKS.Name = StrInput();
-    cout << "Êîë-âî öåõîâ: " << endl;
+    cout << "ÐšÐ¾Ð»-Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð²: " << endl;
     NewKS.Count = NumberInput(1);
-    cout << "Êîë-âî öåõîâ â ðàáîòå: " << endl;
+    cout << "ÐšÐ¾Ð»-Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð² Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ðµ: " << endl;
     NewKS.CountInWork = NumberInput(1, NewKS.Count);
-    cout << "Ýôôåêòèâíîñòü: " << endl;
+    cout << "Ð­Ñ„Ñ„ÐµÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚ÑŒ: " << endl;
     NewKS.Efficiency = NumberInput(0., 1.);
     return in;
 }
 
 std::ifstream &operator>>(ifstream &fin, KS &NewKS) {
-    string input;
-    getline(fin, input);
-    getline(fin, input);
-    NewKS.Name = input;
-    fin >> NewKS.Count >> NewKS.CountInWork >> NewKS.Efficiency;
+    fin >> ws;
+    getline(fin, NewKS.Name);
+    fin >> NewKS.Count >> NewKS.CountInWork >> NewKS.Efficiency >> NewKS.connected;
     return fin;
 }
 
