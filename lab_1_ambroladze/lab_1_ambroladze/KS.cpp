@@ -9,6 +9,11 @@ void KS::DrawHeader() {
          << setw(20) << "Эффективность" << endl;
 }
 
+int KS::GetID()
+{
+    return id;
+}
+
 void KS::createLink()
 {
     if (!connected)
@@ -39,7 +44,8 @@ std::ostream &operator<<(ostream &out, const KS &k) {
 }
 
 std::ofstream &operator<<(ofstream &fout, const KS &k) {
-    fout << k.Name << endl
+    fout << k.id << endl
+         << k.Name << endl
          << k.Count << endl
          << k.CountInWork << endl
          << k.Efficiency << endl
@@ -60,6 +66,7 @@ std::istream &operator>>(istream &in, KS &NewKS) {
 }
 
 std::ifstream &operator>>(ifstream &fin, KS &NewKS) {
+    fin >> NewKS.id;
     fin >> ws;
     getline(fin, NewKS.Name);
     fin >> NewKS.Count >> NewKS.CountInWork >> NewKS.Efficiency >> NewKS.connected;
@@ -67,6 +74,7 @@ std::ifstream &operator>>(ifstream &fin, KS &NewKS) {
 }
 
 KS::KS() {
+    id = ++MaxId;
     Name = "";
     Count = 0;
     CountInWork = 0;

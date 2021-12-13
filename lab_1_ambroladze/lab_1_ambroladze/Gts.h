@@ -20,7 +20,7 @@ class Gts
 
 	vector<vector<double>> weights_matrix;
 
-	vector<vector<double>> throughput_matrix;
+	vector<vector<int>> throughput_matrix;
 
 	void TopologicalSort(const unordered_map<int, int>&);
 
@@ -28,7 +28,18 @@ class Gts
 
 	void FindWay(int, int, const unordered_map<int, int>&);
 
-    void GraphСalculation(const unordered_map<int, pipe>& pipes, const unordered_map<int, KS>& kompres);
+    void GraphСalculation();
+
+    unordered_map<int, int> CreateIndexOfVertices();
+
+    unordered_map<int, int> CreateIndexOfVerticesReverse();
+
+    vector<vector<int>> CreateGraph();
+
+    vector<vector<double>> CreateMatrixWeights();
+
+    vector<vector<int>> CreateMatrixThroughput();
+
 
     unordered_map<int, pipe> pipes;
     unordered_map<int, KS> kompres;

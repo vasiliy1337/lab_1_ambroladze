@@ -75,8 +75,7 @@ int main() {
                 ESG.ConnectObj();
                 break;
             }
-            case 12:
-            {
+            case 12: {
                 ESG.DisconnectObj();
                 break;
             }

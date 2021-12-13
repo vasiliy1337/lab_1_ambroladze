@@ -1,6 +1,8 @@
 ﻿#include "Gts.h"
 
 
+//------------------------------------------------From main------------------------------------------------------
+
 void ShowAllPipes(const unordered_map<int, pipe>& pipes) {
     cout << "Трубопроводы" << endl;
     pipe::DrawHeader();
@@ -52,19 +54,15 @@ bool CreateFile(const unordered_map<int, pipe>& pipes, const unordered_map<int, 
         return false;
     if (pipes.size() > 0) {
         fout << "pipe" << endl << pipes.size() << endl << pipe::MaxId << endl;
-        for (auto& [i, p] : pipes) {
-            fout << i << endl;
+        for (auto& [i, p] : pipes)
             fout << p;
-        }
     }
     else
         fout << "nopipe" << endl;
     if (kompres.size() > 0) {
         fout << "kc" << endl << kompres.size() << endl << KS::MaxId << endl;
-        for (auto& [i, k] : kompres) {
-            fout << i << endl;
+        for (auto& [i, k] : kompres)
             fout << k;
-        }
     }
     else
         fout << "nokc" << endl;
@@ -87,9 +85,8 @@ bool ReadFile(unordered_map<int, pipe>& pipes, unordered_map<int, KS>& kompres, 
         fin >> n;
         fin >> pipe::MaxId;
         for (int i = 0; i < n; ++i) {
-            fin >> id;
             fin >> NewPipe;
-            pipes.insert({ id, NewPipe });
+            pipes.insert({ NewPipe.GetID(), NewPipe });
         }
     }
     kompres.clear();
@@ -101,9 +98,8 @@ bool ReadFile(unordered_map<int, pipe>& pipes, unordered_map<int, KS>& kompres, 
         fin >> n;
         fin >> KS::MaxId;
         for (int i = 0; i < n; ++i) {
-            fin >> id;
             fin >> NewKS;
-            kompres.insert({ id, NewKS });
+            kompres.insert({ NewKS.GetID(), NewKS });
         }
     }
     return true;
@@ -144,9 +140,10 @@ void DeleteBranches(unordered_map<int, pipe>& pipes, unordered_map<int, KS>& kom
         cout << "Ошибка" << endl;
 }
 
-//------------------------------------------------For Graph------------------------------------------------------
 
-unordered_map<int, int> CreateIndexOfVertices(const unordered_map<int, pipe>& pipes, const unordered_map<int, KS>& kompres) {
+//------------------------------------------------For Graph---------------------------------------------------
+
+unordered_map<int, int> Gts::CreateIndexOfVertices() {
     set<int> vertices;
     for (const auto& [i, p] : pipes)
         if (p.CanBeUsed() && kompres.count(p.in) && kompres.count(p.out)) {
@@ -160,7 +157,7 @@ unordered_map<int, int> CreateIndexOfVertices(const unordered_map<int, pipe>& pi
     return VerticesIndex;
 }
 
-unordered_map<int, int> CreateIndexOfVerticesReverse(const unordered_map<int, pipe>& pipes, const unordered_map<int, KS>& kompres) {
+unordered_map<int, int> Gts::CreateIndexOfVerticesReverse() {
     set<int> vertices;
     for (const auto& [i, p] : pipes)
         if (p.CanBeUsed() && kompres.count(p.in) && kompres.count(p.out)) {
@@ -174,8 +171,8 @@ unordered_map<int, int> CreateIndexOfVerticesReverse(const unordered_map<int, pi
     return VerticesIndex;
 }
 
-vector<vector<int>> CreateGraph(const unordered_map<int, pipe>& pipes, const unordered_map<int, KS>& kompres) {
-    unordered_map<int, int> VerticesIndex = CreateIndexOfVertices(pipes, kompres);
+vector<vector<int>> Gts::CreateGraph() {
+    unordered_map<int, int> VerticesIndex = CreateIndexOfVertices();
     vector<vector<int>> r;
     r.resize(VerticesIndex.size());
     for (const auto& [i, p] : pipes)
@@ -184,8 +181,8 @@ vector<vector<int>> CreateGraph(const unordered_map<int, pipe>& pipes, const uno
     return r;
 }
 
-vector<vector<double>> CreateMatrixWeights(const unordered_map<int, pipe>& pipes, const unordered_map<int, KS>& kompres) {
-    unordered_map<int, int> VerticesIndex = CreateIndexOfVertices(pipes, kompres);
+vector<vector<double>> Gts::CreateMatrixWeights() {
+    unordered_map<int, int> VerticesIndex = CreateIndexOfVertices();
     vector<vector<double>> w;
     w.assign(VerticesIndex.size(), {});
     for (int i = 0; i < VerticesIndex.size(); ++i) {
@@ -198,9 +195,9 @@ vector<vector<double>> CreateMatrixWeights(const unordered_map<int, pipe>& pipes
     return w;
 }
 
-vector<vector<double>> CreateMatrixThroughput(const unordered_map<int, pipe>& pipes, const unordered_map<int, KS>& kompres) {
-    unordered_map<int, int> VerticesIndex = CreateIndexOfVertices(pipes, kompres);
-    vector<vector<double>> t;
+vector<vector<int>> Gts::CreateMatrixThroughput() {
+    unordered_map<int, int> VerticesIndex = CreateIndexOfVertices();
+    vector<vector<int>> t;
     t.assign(VerticesIndex.size(), {});
     for (int i = 0; i < VerticesIndex.size(); ++i)
         t[i].assign(VerticesIndex.size(), 0);
@@ -210,12 +207,12 @@ vector<vector<double>> CreateMatrixThroughput(const unordered_map<int, pipe>& pi
     return t;
 }
 
-void Gts::GraphСalculation(const unordered_map<int, pipe>& pipes, const unordered_map<int, KS>& kompres) {
-    ribs = CreateGraph(pipes, kompres);
-    weights_matrix = CreateMatrixWeights(pipes, kompres);
-    throughput_matrix = CreateMatrixThroughput(pipes, kompres);
-    unordered_map<int, int> VerticesIndex = CreateIndexOfVertices(pipes, kompres);
-    unordered_map<int, int> VerticesIndexForOutput = CreateIndexOfVerticesReverse(pipes, kompres);
+void Gts::GraphСalculation() {
+    ribs = CreateGraph();
+    weights_matrix = CreateMatrixWeights();
+    throughput_matrix = CreateMatrixThroughput();
+    unordered_map<int, int> VerticesIndex = CreateIndexOfVertices();
+    unordered_map<int, int> VerticesIndexForOutput = CreateIndexOfVerticesReverse();
     while (true) {
         cout << endl << "1. Топоплогическая сортировка " << endl << "2. Поиск кратчайшего пути " << endl << "3. Поиск максимального потока" << endl << "0. Выход " << endl;
         int graphcase = NumberInput(0, 3);
@@ -302,7 +299,7 @@ void Gts::TopologicalSort(const unordered_map<int, int>& VerticesIndex) {
 void Gts::MaxStream(int start, int end, const unordered_map<int, int>& VerticesIndexForOutput)
 {
 	int n = throughput_matrix.size();
-	vector<vector<double>> c = throughput_matrix;
+	vector<vector<int>> c = throughput_matrix;
 	double MaxFlow = 0;//Искомый максимальный поток
 	while (true) {
 		/*< Поиск в ширину */
@@ -326,7 +323,7 @@ void Gts::MaxStream(int start, int end, const unordered_map<int, int>& VerticesI
 		}
 		if (!used[end])//Не дошли до стока - поток уже максимальный
 			break;
-		double AugFlow = INFINITY;//Дополнительный поток
+		int AugFlow = INT_MAX;//Дополнительный поток
 		/*< Бежим по пути и ищем ребро с минимальной пропускной способностью */
 		int ptr = end;
 		while (ptr != start) {
@@ -379,16 +376,14 @@ void Gts::FindWay(int start, int end, const unordered_map<int, int>& VerticesInd
 
 void Gts::NEWPipe() {
     pipe NewPipe;
-    int NewID = ++NewPipe.MaxId;
     cin >> NewPipe;
-    pipes.insert({ NewID, NewPipe });
+    pipes.insert({ NewPipe.GetID(), NewPipe });
 }
 
 void Gts::NEWKs() {
     KS NewKS;
-    int NewID = ++NewKS.MaxId;
     cin >> NewKS;
-    kompres.insert({ NewID, NewKS });
+    kompres.insert({ NewKS.GetID(), NewKS });
 }
 
 void Gts::PrintObj() {
@@ -498,7 +493,7 @@ void Gts::PrintConnections() {
 
 void Gts::NetCalculation() {
     if (pipes.size() > 0 && kompres.size() > 1)
-        GraphСalculation(pipes, kompres);
+        GraphСalculation();
     else
         cout << "Ошибка " << endl;
 }

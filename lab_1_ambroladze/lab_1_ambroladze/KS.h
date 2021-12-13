@@ -9,6 +9,7 @@
 using namespace std;
 
 class KS {
+    int id;
 public:
     static int MaxId;
     string Name;
@@ -17,6 +18,8 @@ public:
     bool connected;
 
     static void DrawHeader();
+
+    int GetID();
 
     void createLink();
 

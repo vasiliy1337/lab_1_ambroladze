@@ -17,6 +17,11 @@ void pipe::link(int newIn, int newOut) {
         cout << "Ошибка" << endl;
 }
 
+int pipe::GetID()
+{
+    return id;
+}
+
 void pipe::ClearLink() {
     out = 0;
     in = 0;
@@ -39,8 +44,8 @@ void pipe::showlink(int ID) const {
          << endl;
 }
 
-double pipe::GetProductivity() const {
-    return 10000*sqrt(pow(double(diameter)/1000, 5) / length);
+int pipe::GetProductivity() const {
+    return round(10000*sqrt(pow(double(diameter)/1000, 5) / length));
 }
 
 ostream &operator<<(std::ostream &out, const pipe &p) {
@@ -64,7 +69,8 @@ istream &operator>>(istream &in, pipe &NewPipe) {
 }
 
 ofstream &operator<<(ofstream &fout, const pipe &p) {
-    fout << p.Name << endl
+    fout << p.id << endl
+         << p.Name << endl
          << p.length << endl
          << p.diameter << endl
          << p.repair << endl
@@ -74,6 +80,7 @@ ofstream &operator<<(ofstream &fout, const pipe &p) {
 }
 
 ifstream &operator>>(ifstream &fin, pipe &NewPipe) {
+    fin >> NewPipe.id;
     fin >> ws;
     getline(fin, NewPipe.Name);
     fin >> NewPipe.length >> NewPipe.diameter >> NewPipe.repair >> NewPipe.in >> NewPipe.out;
@@ -81,6 +88,7 @@ ifstream &operator>>(ifstream &fin, pipe &NewPipe) {
 }
 
 pipe::pipe() {
+    id = ++MaxId;
     Name = "";
     length = 0.;
     diameter = 0;

@@ -9,6 +9,7 @@
 using namespace std;
 
 class pipe {
+    int id;
 public :
     static int MaxId;
     string Name;
@@ -21,6 +22,8 @@ public :
 
     void link(int newIn, int newOut);
 
+    int GetID();
+
     void ClearLink();
 
     void edit();
@@ -31,7 +34,7 @@ public :
 
     void showlink(int ID) const;
 
-    double GetProductivity() const;
+    int GetProductivity() const;
 
     friend ostream &operator<<(ostream &out, const pipe &p);
 
