@@ -39,6 +39,10 @@ void pipe::showlink(int ID) const {
          << endl;
 }
 
+double pipe::GetProductivity() const {
+    return 10000*sqrt(pow(double(diameter)/1000, 5) / length);
+}
+
 ostream &operator<<(std::ostream &out, const pipe &p) {
     out << setw(20) << p.Name <<
         setw(20) << p.length <<

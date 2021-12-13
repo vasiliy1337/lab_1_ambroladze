@@ -31,6 +31,8 @@ public :
 
     void showlink(int ID) const;
 
+    double GetProductivity() const;
+
     friend ostream &operator<<(ostream &out, const pipe &p);
 
     friend ofstream &operator<<(ofstream &fout, const pipe &p);
